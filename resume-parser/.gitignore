@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Uploaded temp resumes (just in case)
+*.pdf
+
+# Python environment files
+Pipfile.lock
+
+# PyInstaller
+build/
+dist/
+*.spec
