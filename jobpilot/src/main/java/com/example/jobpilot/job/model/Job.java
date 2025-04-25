@@ -1,0 +1,63 @@
+package com.example.jobpilot.job.model;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+import com.example.jobpilot.user.model.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "jobs")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Job {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    private String title;
+    private String company;
+    private String location;
+    private String employmentType; // e.g., Full-time, Part-time, Remote
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @ElementCollection
+    private List<String> requiredSkills;
+
+    private String url;
+    private String source; // "LinkedIn", "Seek", "Manual", etc.
+
+    private Double matchScore; // Calculated value
+    private String status;     // SAVED, APPLIED, REJECTED
+
+    private Instant createdAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String matchFeedback;   
+    @ElementCollection
+    private List<String> missingSkills;
+}
