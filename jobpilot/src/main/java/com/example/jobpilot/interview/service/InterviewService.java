@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
+import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.interview.dto.InterviewQuestionsResponse;
 import com.example.jobpilot.interview.dto.InterviewRequest;
 import lombok.RequiredArgsConstructor;

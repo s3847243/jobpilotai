@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.jobpilot.auth.repository.UserRepository;
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.job.dto.ManualJobRequest;
+import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.service.JobService;
 import com.example.jobpilot.resume.model.Resume;
@@ -71,11 +72,14 @@ public class JobController {
     }
 
     @PatchMapping("/{jobId}/status")
-    public ResponseEntity<Job> updateStatus(@PathVariable UUID jobId,
-                                            @RequestParam String status,
-                                            HttpServletRequest request) {
-        User user = getUserFromRequest(request);
-        return ResponseEntity.ok(jobService.updateJobStatus(jobId, status, user));
+    public ResponseEntity<Job> updateStatus(
+            @PathVariable UUID jobId,
+            @RequestBody UpdateJobStatusRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        User user = getUserFromRequest(httpRequest);
+        Job updatedJob = jobService.updateJobStatus(jobId, request.getStatus(), user);
+        return ResponseEntity.ok(updatedJob);
     }
     @PostMapping("/manual")
     public ResponseEntity<Job> addManualJob(@RequestBody ManualJobRequest request, HttpServletRequest httpRequest) {

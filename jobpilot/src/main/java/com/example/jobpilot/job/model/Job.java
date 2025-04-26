@@ -9,6 +9,8 @@ import com.example.jobpilot.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -52,8 +54,8 @@ public class Job {
     private String source; // "LinkedIn", "Seek", "Manual", etc.
 
     private Double matchScore; // Calculated value
-    private String status;     // SAVED, APPLIED, REJECTED
-
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
     private Instant createdAt;
 
     @Column(columnDefinition = "TEXT")

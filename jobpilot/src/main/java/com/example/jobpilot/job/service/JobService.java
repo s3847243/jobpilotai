@@ -2,21 +2,25 @@ package com.example.jobpilot.job.service;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
+import com.example.jobpilot.ai.service.OpenAiService;
+import com.example.jobpilot.job.dto.JobDetailsDTO;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.model.Job;
+import com.example.jobpilot.job.model.JobStatus;
 import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.user.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,22 +31,42 @@ public class JobService {
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
     public Job addJobFromUrl(String url, User user) {
-        
-        Job job = Job.builder()
-                .user(user)
-                .title("Backend Developer")
-                .company("Acme Corp")
-                .location("Remote")
-                .employmentType("Full-time")
-                .description("We are looking for a backend developer skilled in Java, Spring Boot, and AWS.")
-                .requiredSkills(List.of("java", "spring boot", "aws"))
-                .url(url)
-                .source("Manual")
-                .status("SAVED")
-                .createdAt(Instant.now())
-                .build();
+        try {
+            // Step 1: Fetch job page
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla")
+                    .timeout(10_000)
+                    .get();
 
-        return jobRepository.save(job);
+            String pageText = doc.body().text();
+
+            // Step 2: Ask OpenAI to extract job info
+            String aiJson = openAiService.extractJobInfoFromText(pageText);
+
+            // Step 3: Convert JSON to Java object
+            ObjectMapper mapper = new ObjectMapper();
+            JobDetailsDTO parsed = mapper.readValue(aiJson, JobDetailsDTO.class);
+
+            // Step 4: Save to DB
+            Job job = Job.builder()
+                    .user(user)
+                    .title(parsed.getTitle())
+                    .company(parsed.getCompany())
+                    .location(parsed.getLocation())
+                    .employmentType(parsed.getEmploymentType())
+                    .description(parsed.getDescription())
+                    .requiredSkills(parsed.getRequiredSkills())
+                    .url(url)
+                    .source("OpenAI")
+                    .status(JobStatus.SAVED) 
+                    .createdAt(Instant.now())
+                    .build();
+
+            return jobRepository.save(job);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to extract job from URL", e);
+        }
     }
 
     // === Resume-Job Matching (basic skill overlap) ===
@@ -93,12 +117,12 @@ public class JobService {
         return jobRepository.findById(jobId);
     }
 
-    public Job updateJobStatus(UUID jobId, String newStatus, User user) {
+    public Job updateJobStatus(UUID jobId, JobStatus newStatus, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
         if (!job.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("Unauthorized to update this job");
         }
 
         job.setStatus(newStatus);
@@ -115,7 +139,7 @@ public class JobService {
             .description(request.getDescription())
             .requiredSkills(request.getRequiredSkills())
             .source("Manual")
-            .status("SAVED")
+            .status(JobStatus.SAVED) 
             .createdAt(Instant.now())
             .build();
 
