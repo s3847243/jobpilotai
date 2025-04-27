@@ -16,7 +16,6 @@ const JobTable = ({ jobs }) => {
           </tr>
         </thead>
 
-        {/* Table Body for job items */}
         <tbody>
           {jobs.map((job) => (
             <JobItems

@@ -13,6 +13,7 @@ import { Edit } from 'lucide-react'
 import { PersonStanding } from 'lucide-react'
 import { Moon } from 'lucide-react'
 import JobApp from '../components/job-applications/JobApp'
+import ResumeApp from '../components/resume/ResumeApp'
 const Home = () => {
   return (
     <div className="flex">
@@ -27,8 +28,13 @@ const Home = () => {
             <SidebarItem icon={<Moon size={20}  />} text="Theme"  />
 
         </Sidebar>
-        <div className="flex-1 p-6"> {/* Add padding for nicer look */}
+{/* 
+        <div className="flex-1 p-6"> 
           <JobApp />
+        </div>
+         */}
+        <div className="flex-1 p-6"> {/* Add padding for nicer look */}
+          <ResumeApp />
         </div>
 
     </div>
