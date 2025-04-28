@@ -1,9 +1,11 @@
 import React, { useContext } from 'react'
 import { SidebarContext } from './Sidebar'
-const SidebarItem = ({ icon, text, active }: { icon: React.ReactNode; text: string; active?: boolean }) => {
+import { Link } from 'react-router-dom';
+const SidebarItem = ({ icon, text, active, to }: { icon: React.ReactNode; text: string; active?: boolean ; to:string}) => {
     const { expanded } = useContext(SidebarContext)!
     
   return (
+    <Link to={to} className="block">
     <li
       className={`
         relative flex items-center py-2 px-3 my-1
@@ -38,6 +40,8 @@ const SidebarItem = ({ icon, text, active }: { icon: React.ReactNode; text: stri
               )}
 
     </li>
+    </Link>
+
   )
 }
 

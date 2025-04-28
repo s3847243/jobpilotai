@@ -3,9 +3,8 @@ import JobItems from "./JobItems"; // assuming you split the row into another fi
 
 const JobTable = ({ jobs }) => {
   return (
-    <div className="overflow-x-auto rounded-xl shadow bg-white">
+    <div className="overflow:visible rounded-xl shadow bg-white">
       <table className="w-full table-auto">
-        {/* Table Head only ONCE */}
         <thead>
           <tr className="bg-gray-100 text-gray-700">
             <th className="px-6 py-3 text-left text-sm font-semibold">Status</th>

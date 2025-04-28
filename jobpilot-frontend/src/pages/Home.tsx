@@ -1,44 +1,47 @@
 import React from 'react'
-import Sidebar from '../components/sidebar/Sidebar'
-import SidebarItem from '../components/sidebar/SidebarItem'
-import { LayoutDashboard }  from 'lucide-react'
-import { BarChart3 } from 'lucide-react'
-import { Boxes } from 'lucide-react'
-import { Package } from 'lucide-react'
-import { Receipt } from 'lucide-react'
-import { Settings } from 'lucide-react' 
-import { LifeBuoy } from 'lucide-react'
-import { File } from 'lucide-react'
-import { Edit } from 'lucide-react'
-import { PersonStanding } from 'lucide-react'
-import { Moon } from 'lucide-react'
-import JobApp from '../components/job-applications/JobApp'
-import ResumeApp from '../components/resume/ResumeApp'
+import { Link } from 'react-router-dom';
+
 const Home = () => {
   return (
-    <div className="flex">
-        <Sidebar>
-            <SidebarItem icon={<BarChart3 size={20}  />} text="Job Applications"  />
-            <SidebarItem icon={<File size={20}  />} text="Resumes"  />
-            <SidebarItem icon={<Edit size={20}  />} text="Cover letters"  />
-            <SidebarItem icon={<PersonStanding size={20}  />} text="Job Interviews"  />
-            <SidebarItem icon={<BarChart3 size={20}  />} text="Follow Up Email"  />
-            <hr className='my-3'/>
-            <SidebarItem icon={<Settings size={20}  />} text="Settings"  />
-            <SidebarItem icon={<Moon size={20}  />} text="Theme"  />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      
+      {/* Top Nav */}
+      <header className="flex justify-between items-center p-6 bg-white shadow-md">
+        <h1 className="text-2xl font-bold text-gray-800">
+          JobPilot AI 🚀
+        </h1>
+        <Link to="/dashboard/job-hub">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md">
+            Go to Dashboard
+          </button>
+        </Link>
+      </header>
 
-        </Sidebar>
-{/* 
-        <div className="flex-1 p-6"> 
-          <JobApp />
-        </div>
-         */}
-        <div className="flex-1 p-6"> {/* Add padding for nicer look */}
-          <ResumeApp />
-        </div>
+      {/* Main Content */}
+      <main className="flex flex-col items-center justify-center flex-grow p-10 text-center">
+        <h2 className="text-4xl font-bold mb-4 text-gray-800">
+          Your AI Assistant for Smarter Job Applications
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl mb-8">
+          Upload your resumes, match them to jobs, generate personalized cover letters, 
+          track your applications, and get AI-powered improvement tips to land your dream role faster.
+        </p>
+
+        <Link to="/dashboard/job-hub">
+          <button className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl text-lg">
+            Start Applying Today 🚀
+          </button>
+        </Link>
+      </main>
+
+      {/* Footer */}
+      <footer className="p-6 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} JobPilot AI. All rights reserved.
+      </footer>
 
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
+
