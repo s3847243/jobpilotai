@@ -21,6 +21,8 @@ const ResumePage = () => {
         feedback={resume.feedback}
         onImprove={handleImprove}
         onReplace={handleReplace}
+        matchScore={50}
+        missingSkills={["AWS", "Dockers"]}
       />
       <JobsLinkedTable jobs={jobs} />
       <ResumeActionButtons 

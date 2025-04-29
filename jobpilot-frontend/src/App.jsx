@@ -17,7 +17,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
           <Route path="job-hub" element={<JobApp />} />
           <Route path="resumes" element={<ResumeApp />} />
-          <Route path="cover-letters" element={<CoverLetterPage />} />
+          <Route path="cover-letters/:coverLetterId" element={<CoverLetterPage />} />
           <Route path="resumes/:resumeId" element={<ResumePage />} />
         </Route>
 
