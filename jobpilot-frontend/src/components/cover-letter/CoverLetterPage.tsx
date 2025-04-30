@@ -17,16 +17,26 @@ const CoverLetterPage = () => {
           <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
             💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
           </p>
+          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
+            💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
+          </p>
+          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
+            💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
+          </p>
         </div>
 
-        {/* (Optional) User reply input */}
-        <div className="mt-auto">
+        <div className="mt-auto flex gap-3">
           <input
             type="text"
             placeholder="Ask for help or rewrite a section..."
             className="w-full border px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-        </div>
+          <button
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md transition duration-200"
+            >
+              Enter
+            </button>
+          </div>
       </div>
 
       {/* Right: Cover Letter Viewer */}
