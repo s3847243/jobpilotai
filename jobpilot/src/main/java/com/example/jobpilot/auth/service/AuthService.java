@@ -51,7 +51,7 @@ public class AuthService {
         userRepository.save(user);
     
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+        String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
     
         return AuthResponse.builder()
             .accessToken(accessToken)
@@ -71,7 +71,7 @@ public class AuthService {
         // }
     
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+        String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
     
         return AuthResponse.builder()
             .accessToken(accessToken)

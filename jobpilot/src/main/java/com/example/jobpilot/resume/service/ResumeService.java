@@ -59,7 +59,7 @@ public class ResumeService {
         Resume resume = resumeRepository.findById(resumeId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-        if (!resume.getUser().getId().equals(user.getId())) {
+        if (!resume.getUser().getUserId().equals(user.getUserId())) {
             throw new RuntimeException("Access denied");
         }
 

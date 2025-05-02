@@ -121,7 +121,7 @@ public class JobService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        if (!job.getUser().getId().equals(user.getId())) {
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
             throw new RuntimeException("Unauthorized to update this job");
         }
 

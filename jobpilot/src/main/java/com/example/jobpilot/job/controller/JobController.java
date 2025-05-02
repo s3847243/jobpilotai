@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.jobpilot.auth.repository.UserRepository;
+import com.example.jobpilot.user.repository.UserRepository;
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;

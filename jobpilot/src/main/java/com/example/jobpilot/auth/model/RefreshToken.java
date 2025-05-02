@@ -29,7 +29,7 @@ public class RefreshToken {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false, unique = true)
@@ -38,5 +38,4 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    // Getters, Setters, Constructors
 }

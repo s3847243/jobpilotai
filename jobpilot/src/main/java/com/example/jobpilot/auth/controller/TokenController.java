@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.jobpilot.auth.dto.AuthResponse;
 import com.example.jobpilot.auth.dto.TokenRefreshRequest;
 import com.example.jobpilot.auth.model.RefreshToken;
-import com.example.jobpilot.auth.repository.UserRepository;
+import com.example.jobpilot.user.repository.UserRepository;
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.auth.service.RefreshTokenService;
 import com.example.jobpilot.user.model.User;
@@ -47,7 +47,7 @@ public class TokenController {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        refreshTokenService.revokeByUserId(user.getId());
+        refreshTokenService.revokeByUserId(user.getUserId());
 
         return ResponseEntity.ok("User logged out successfully");
     }

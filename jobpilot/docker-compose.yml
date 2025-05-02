@@ -1,0 +1,18 @@
+
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: jobpilot_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: jobpilotdb
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Hamraan@2011
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
