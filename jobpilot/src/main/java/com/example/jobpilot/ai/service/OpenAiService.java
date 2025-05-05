@@ -9,8 +9,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.jobpilot.resume.dto.ParsedResumeDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 
 @Service
@@ -23,13 +28,17 @@ public class OpenAiService {
     @Value("${openai.model}")
     private String model;
 
-    private final WebClient webClient = WebClient.builder()
-            .baseUrl("https://api.openai.com/v1")
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+    private WebClient webClient;
 
-    // Core method: send prompt and get response
+    @PostConstruct
+    public void init() {
+        this.webClient = WebClient.builder()
+                .baseUrl("https://api.openai.com/v1")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
     public String getRawResponse(String prompt) {
         Map<String, Object> request = Map.of(
                 "model", model,
@@ -120,5 +129,28 @@ public class OpenAiService {
         """, resumeSummary, jobTitle, companyName, jobDescription);
 
         return getRawResponse(prompt);
+    }
+    public ParsedResumeDTO extractResumeInfo(String resumeText) {
+        String prompt = """
+            Extract the following details from this resume text and return it as JSON with fields:
+            {
+              "name": "...",
+              "email": "...",
+              "phone": "...",
+              "skills": ["...", "..."],
+              "summary": "..."
+            }
+    
+            Resume Text:
+            """ + resumeText;
+    
+        try {
+            String jsonResponse = getRawResponse(prompt); // NOT openAiClient.callWithPrompt
+    
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(jsonResponse, ParsedResumeDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse OpenAI response as JSON", e);
+        }
     }
 }

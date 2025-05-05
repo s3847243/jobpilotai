@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.user.model.User;
 
 import jakarta.persistence.Column;
@@ -47,6 +48,9 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "resume_id")
+    private Resume resume;
     @ElementCollection
     private List<String> requiredSkills;
 
@@ -62,4 +66,6 @@ public class Job {
     private String matchFeedback;   
     @ElementCollection
     private List<String> missingSkills;
+    @Column(length = 5000) // adjust as needed
+    private String coverLetter;
 }

@@ -1,5 +1,6 @@
 package com.example.jobpilot.job.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,15 +13,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jobpilot.user.repository.UserRepository;
+import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.auth.service.JwtService;
+import com.example.jobpilot.coverletter.dto.CoverLetterResponse;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
 import com.example.jobpilot.job.model.Job;
+import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.job.service.JobService;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.resume.repository.ResumeRepository;
+import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,8 +39,10 @@ public class JobController {
 
     private final JobService jobService;
     private final UserRepository userRepository;
-    private final ResumeRepository resumeRepository;
     private final JwtService jwtService;
+    private final ResumeService resumeService;
+    private final OpenAiService openAiService;
+    private final JobRepository jobRepository;
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
@@ -44,26 +52,33 @@ public class JobController {
     }
 
     @PostMapping("/from-url")
-    public ResponseEntity<Job> addFromUrl(@RequestParam String url, HttpServletRequest request) {
+    public ResponseEntity<Job> addFromUrl(@RequestParam String url,@RequestParam("file") MultipartFile file,HttpServletRequest request) throws IOException{
         User user = getUserFromRequest(request);
-        Job job = jobService.addJobFromUrl(url, user);
+        Resume resume = resumeService.uploadResume(file, user);
+        Job job = jobService.addJobFromUrl(url, user, resume);
         return ResponseEntity.ok(job);
     }
 
     @GetMapping("/{jobId}/match")
     public ResponseEntity<Job> matchJob(@PathVariable UUID jobId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        Resume latestResume = resumeRepository.findByUser(user).stream()
-                .sorted((a, b) -> b.getUploadedAt().compareTo(a.getUploadedAt()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No resumes uploaded"));
-
+    
         Job job = jobService.getJobById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
-
-        Job updated = jobService.matchJobWithResume(job, latestResume);
+    
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized to match this job");
+        }
+    
+        Resume resume = job.getResume();
+        if (resume == null) {
+            throw new RuntimeException("This job has no resume assigned");
+        }
+    
+        Job updated = jobService.matchJobWithResume(job, resume);
         return ResponseEntity.ok(updated);
     }
+    
 
     @GetMapping
     public ResponseEntity<List<Job>> listJobs(HttpServletRequest request) {
@@ -78,7 +93,7 @@ public class JobController {
             HttpServletRequest httpRequest
     ) {
         User user = getUserFromRequest(httpRequest);
-        Job updatedJob = jobService.updateJobStatus(jobId, request.getStatus(), user);
+        Job updatedJob = jobService.updateJobStatus(jobId, request.getStatus().toString(), user);
         return ResponseEntity.ok(updatedJob);
     }
     @PostMapping("/manual")
@@ -86,6 +101,31 @@ public class JobController {
         User user = getUserFromRequest(httpRequest);
         Job job = jobService.addManualJob(request, user);
         return ResponseEntity.ok(job);
+    }
+
+    @PostMapping("/{jobId}/generate-cover-letter")
+    public ResponseEntity<String> generateCoverLetter(
+            @PathVariable UUID jobId,
+            HttpServletRequest request
+    ) 
+    {
+        User user = getUserFromRequest(request);
+        Job updatedJob = jobService.generateAndStoreCoverLetter(jobId, user);
+        return ResponseEntity.ok(new CoverLetterResponse(updatedJob.getCoverLetter()));
+    }
+
+
+    @GetMapping("/{jobId}/cover-letter")
+    public ResponseEntity<String> getCoverLetter(@PathVariable UUID jobId, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        Job job = jobService.getJobById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        return ResponseEntity.ok(job.getCoverLetter());
     }
 
 }

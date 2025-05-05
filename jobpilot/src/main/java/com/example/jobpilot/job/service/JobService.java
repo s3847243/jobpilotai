@@ -1,6 +1,7 @@
 package com.example.jobpilot.job.service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
-    public Job addJobFromUrl(String url, User user) {
+    public Job addJobFromUrl(String url, User user, Resume resume) {
         try {
             // Step 1: Fetch job page
             Document doc = Jsoup.connect(url)
@@ -50,6 +51,7 @@ public class JobService {
             // Step 4: Save to DB
             Job job = Job.builder()
                     .user(user)
+                    .resume(resume)
                     .title(parsed.getTitle())
                     .company(parsed.getCompany())
                     .location(parsed.getLocation())
@@ -103,7 +105,7 @@ public class JobService {
     
         job.setMatchScore(score);
         job.setMatchFeedback(feedback);
-        job.setMissingSkills(extractMissingSkills(feedback));
+        job.setMissingSkills(new ArrayList<>(extractMissingSkills(feedback)));
 
     
         return jobRepository.save(job);
@@ -117,15 +119,21 @@ public class JobService {
         return jobRepository.findById(jobId);
     }
 
-    public Job updateJobStatus(UUID jobId, JobStatus newStatus, User user) {
+    public Job updateJobStatus(UUID jobId, String status, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
-
+    
         if (!job.getUser().getUserId().equals(user.getUserId())) {
             throw new RuntimeException("Unauthorized to update this job");
         }
-
-        job.setStatus(newStatus);
+    
+        try {
+            JobStatus jobStatus = JobStatus.valueOf(status.toUpperCase());
+            job.setStatus(jobStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status: " + status);
+        }
+    
         return jobRepository.save(job);
     }
 
@@ -145,6 +153,30 @@ public class JobService {
 
     return jobRepository.save(job);
     }   
+    public Job generateAndStoreCoverLetter(UUID jobId, User user) {
+        Job job = getJobById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+    
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+    
+        Resume resume = job.getResume();
+        if (resume == null) {
+            throw new RuntimeException("Resume not found for job");
+        }
+    
+        String coverLetter = openAiService.generateCoverLetter(
+                resume.getParsedSummary(),
+                job.getTitle(),
+                job.getCompany(),
+                job.getDescription()
+        );
+    
+        job.setCoverLetter(coverLetter);
+        return jobRepository.save(job);
+    }
+    
 
 
     

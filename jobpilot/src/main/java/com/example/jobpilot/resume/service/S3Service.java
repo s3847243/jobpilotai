@@ -28,7 +28,7 @@ public class S3Service {
         @Value("${aws.s3.region}") String region
     ) {
         this.s3Client = S3Client.builder()
-                .region(Region.of(region))
+                .region(Region.AP_SOUTHEAST_2)
                 .credentialsProvider(
                     StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)

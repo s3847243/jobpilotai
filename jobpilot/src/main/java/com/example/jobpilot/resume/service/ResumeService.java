@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.resume.dto.ParsedResumeDTO;
 import com.example.jobpilot.resume.model.MultipartInputStreamFileResource;
 import com.example.jobpilot.resume.model.Resume;
@@ -29,27 +32,29 @@ public class ResumeService {
 
     private final ResumeRepository resumeRepository;
     private final S3Service s3Service;
+    private final OpenAiService openAiService;
 
    public Resume uploadResume(MultipartFile file, User user) throws IOException {
-    String s3Url = s3Service.uploadFile(file);
+        String s3Url = s3Service.uploadFile(file);
 
-    
-    ParsedResumeDTO parsed = parseWithPythonParser(file); 
+        
+        String resumeText = extractTextFromPdf(file); // You’ll need a PDF parser like Apache PDFBox or Tika
+        ParsedResumeDTO parsed = openAiService.extractResumeInfo(resumeText);
 
-    Resume resume = Resume.builder()
-            .user(user)
-            .filename(file.getOriginalFilename())
-            .s3Url(s3Url)
-            .parsedName(parsed.getName())
-            .parsedEmail(parsed.getEmail())
-            .parsedPhone(parsed.getPhone())
-            .parsedSkills(parsed.getSkills())
-            .parsedSummary(parsed.getSummary())
-            .uploadedAt(Instant.now())
-            .build();
+        Resume resume = Resume.builder()
+                .user(user)
+                .filename(file.getOriginalFilename())
+                .s3Url(s3Url)
+                .parsedName(parsed.getName())
+                .parsedEmail(parsed.getEmail())
+                .parsedPhone(parsed.getPhone())
+                .parsedSkills(parsed.getSkills())
+                .parsedSummary(parsed.getSummary())
+                .uploadedAt(Instant.now())
+                .build();
 
-    return resumeRepository.save(resume);
-}
+        return resumeRepository.save(resume);
+    }
 
     public List<Resume> getResumesByUser(User user) {
         return resumeRepository.findByUser(user);
@@ -66,23 +71,12 @@ public class ResumeService {
         resumeRepository.delete(resume);
     }
 
-    private ParsedResumeDTO parseWithPythonParser(MultipartFile file) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new MultipartInputStreamFileResource(file.getInputStream(), file.getOriginalFilename()));
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ParsedResumeDTO> response = restTemplate.postForEntity(
-                "http://localhost:8000/parse",
-                requestEntity,
-                ParsedResumeDTO.class
-        );
-
-        return response.getBody();
+    public String extractTextFromPdf(MultipartFile file) throws IOException {
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        }
     }
 
 }
