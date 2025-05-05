@@ -66,6 +66,6 @@ public class Job {
     private String matchFeedback;   
     @ElementCollection
     private List<String> missingSkills;
-    @Column(length = 5000) // adjust as needed
+    @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
     private String coverLetter;
 }

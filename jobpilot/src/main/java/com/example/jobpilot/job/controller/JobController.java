@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.jobpilot.user.repository.UserRepository;
 import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.auth.service.JwtService;
-import com.example.jobpilot.coverletter.dto.CoverLetterResponse;
+import com.example.jobpilot.job.dto.CoverLetterResponse;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
 import com.example.jobpilot.job.model.Job;
@@ -104,7 +104,7 @@ public class JobController {
     }
 
     @PostMapping("/{jobId}/generate-cover-letter")
-    public ResponseEntity<String> generateCoverLetter(
+    public ResponseEntity<CoverLetterResponse> generateCoverLetter(
             @PathVariable UUID jobId,
             HttpServletRequest request
     ) 
@@ -116,7 +116,7 @@ public class JobController {
 
 
     @GetMapping("/{jobId}/cover-letter")
-    public ResponseEntity<String> getCoverLetter(@PathVariable UUID jobId, HttpServletRequest request) {
+    public ResponseEntity<CoverLetterResponse> getCoverLetter(@PathVariable UUID jobId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
         Job job = jobService.getJobById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -125,7 +125,7 @@ public class JobController {
             throw new RuntimeException("Unauthorized");
         }
 
-        return ResponseEntity.ok(job.getCoverLetter());
+        return ResponseEntity.ok(new CoverLetterResponse(job.getCoverLetter()));
     }
 
 }
