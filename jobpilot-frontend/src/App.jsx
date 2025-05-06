@@ -4,14 +4,14 @@ import CoverLetterPage from './components/cover-letter/CoverLetterPage';
 import ResumePage from './components/resume/ResumePage';
 import ResumeApp from './components/resume/ResumeApp';
 import JobApp from './components/job-applications/JobApp';
-
-import Home from './pages/Home'
+import Home from './pages/Home';
+import Login from './pages/Login'
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-
+        <Route path='/login' element={<Login />} />
 
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/job-hub" />} />

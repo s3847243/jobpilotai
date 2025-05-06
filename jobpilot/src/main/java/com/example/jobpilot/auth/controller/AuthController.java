@@ -1,6 +1,8 @@
 package com.example.jobpilot.auth.controller;
 
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,6 +10,9 @@ import com.example.jobpilot.auth.dto.AuthResponse;
 import com.example.jobpilot.auth.dto.LoginRequest;
 import com.example.jobpilot.auth.dto.RegisterRequest;
 import com.example.jobpilot.auth.service.AuthService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,8 +29,30 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
-    }
+   @PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    AuthResponse authResponse = authService.login(request); // generates tokens
+
+    // Set Access Token
+    Cookie accessTokenCookie = new Cookie("accessToken", authResponse.getAccessToken());
+    accessTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setSecure(true); // Only on HTTPS
+    accessTokenCookie.setPath("/");
+    accessTokenCookie.setMaxAge(15 * 60); // 15 minutes
+
+    // Set Refresh Token
+    Cookie refreshTokenCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setPath("/");
+    refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+
+    response.addCookie(accessTokenCookie);
+    response.addCookie(refreshTokenCookie);
+
+    return ResponseEntity.ok(Map.of(
+        "user", authResponse.getUser() // or whatever user object you return
+    ));
+}
+
 }

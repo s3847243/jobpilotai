@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.jobpilot.auth.dto.AuthResponse;
 import com.example.jobpilot.auth.dto.LoginRequest;
 import com.example.jobpilot.auth.dto.RegisterRequest;
+import com.example.jobpilot.user.dto.UserDTO;
 import com.example.jobpilot.user.model.Role;
 import com.example.jobpilot.user.model.User;
 import com.example.jobpilot.user.repository.UserRepository;
@@ -76,6 +77,7 @@ public class AuthService {
         return AuthResponse.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
+            .user(UserDTO.from(user))
             .build();
     }
 }
