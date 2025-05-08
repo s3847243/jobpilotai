@@ -1,6 +1,10 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 const CoverLetterPage = () => {
+  const {jobId} = useParams<{ jobId: string }>();
+
+
   return (
     <div className="flex h-[calc(100vh-64px)] bg-gray-50">
       
@@ -13,15 +17,6 @@ const CoverLetterPage = () => {
           </p>
           <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
             ✍️ Suggestion: Add more quantifiable impact — e.g., “improved response time by 35%”.
-          </p>
-          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
-            💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
-          </p>
-          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
-            💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
-          </p>
-          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
-            💡 Tip: Match keywords like “microservices”, “Docker” — they appear in the job ad.
           </p>
         </div>
 

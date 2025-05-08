@@ -1,7 +1,10 @@
 import React from "react";
 import JobItems from "./JobItems"; // assuming you split the row into another file
-
-const JobTable = ({ jobs }) => {
+import { Job } from "./JobApp";
+export type Props = {
+  jobs: Job[];
+};
+const JobTable: React.FC<Props>  = ({ jobs }) => {
   return (
     <div className="overflow:visible rounded-xl shadow bg-white">
       <table className="w-full table-auto">
@@ -17,13 +20,7 @@ const JobTable = ({ jobs }) => {
 
         <tbody>
           {jobs.map((job) => (
-            <JobItems
-              key={job.id}
-              status={job.status}
-              companyName={job.companyName}
-              resume={job.resume}
-              coverLetter={job.coverLetter}
-            />
+            <JobItems key={job.id} job={job} />
           ))}
         </tbody>
       </table>

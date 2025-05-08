@@ -2,6 +2,7 @@ package com.example.jobpilot.job.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import com.example.jobpilot.resume.repository.ResumeRepository;
 import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -41,11 +43,21 @@ public class JobController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final ResumeService resumeService;
-    private final OpenAiService openAiService;
-    private final JobRepository jobRepository;
 
+
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        throw new RuntimeException("JWT token not found in cookies");
+    }
+    
     private User getUserFromRequest(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+        String token = extractTokenFromCookie(request);
         String email = jwtService.extractEmail(token);
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -85,7 +97,15 @@ public class JobController {
         User user = getUserFromRequest(request);
         return ResponseEntity.ok(jobService.getUserJobs(user));
     }
-
+    @GetMapping("/{jobId}")
+    public ResponseEntity< Optional<Job>> getJobById(
+            @PathVariable UUID jobId,
+            HttpServletRequest httpRequest
+    ) {
+        User user = getUserFromRequest(httpRequest);
+        Optional<Job> job = jobService.getJobById(jobId);
+        return ResponseEntity.ok(job);
+    }
     @PatchMapping("/{jobId}/status")
     public ResponseEntity<Job> updateStatus(
             @PathVariable UUID jobId,

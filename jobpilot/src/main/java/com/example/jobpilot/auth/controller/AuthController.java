@@ -36,17 +36,23 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRes
     // Set Access Token
     Cookie accessTokenCookie = new Cookie("accessToken", authResponse.getAccessToken());
     accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setSecure(true); // Only on HTTPS
+    accessTokenCookie.setSecure(false); // Only on HTTPS
     accessTokenCookie.setPath("/");
     accessTokenCookie.setMaxAge(15 * 60); // 15 minutes
 
     // Set Refresh Token
     Cookie refreshTokenCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
     refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setSecure(false);
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+    response.setHeader("Set-Cookie",
+    "accessToken=" + authResponse.getAccessToken() +
+    "; HttpOnly; Path=/; Max-Age=900; SameSite=Lax");
 
+    response.setHeader("Set-Cookie",
+        "refreshToken=" + authResponse.getRefreshToken() +
+        "; HttpOnly; Path=/; Max-Age=" + (7 * 24 * 60 * 60) + "; SameSite=Lax");
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
 

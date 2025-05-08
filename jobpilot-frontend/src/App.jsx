@@ -17,8 +17,8 @@ function App() {
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
           <Route path="job-hub" element={<JobApp />} />
           <Route path="resumes" element={<ResumeApp />} />
-          <Route path="cover-letters/:coverLetterId" element={<CoverLetterPage />} />
-          <Route path="resumes/:resumeId" element={<ResumePage />} />
+          <Route path="cover-letters/:jobId" element={<CoverLetterPage />} />
+          <Route path="resumes/:jobId" element={<ResumePage />} />
         </Route>
 
         <Route path="*" element={<p>404 Page Not Found</p>} />

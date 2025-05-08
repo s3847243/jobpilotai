@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
-
-const JobItems = ({ status, companyName, resume, coverLetter }) => {
-  const resumeId = "asd";
+import { Resume } from './JobApp';
+import { Job } from './JobApp';
+type Props = {
+  job: Job;
+};
+const JobItems:React.FC<Props> = ({ job }) => {
   const coverLetterId = "asd";
   const [open, setOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Saved"); // <-- default option
@@ -62,10 +65,10 @@ const JobItems = ({ status, companyName, resume, coverLetter }) => {
   )}
 </div>
         </td>
-        <td className="px-6 py-4">{companyName}</td>
+        <td className="px-6 py-4">{job.company}</td>
         <td className="px-6 py-4">
           <Link 
-            to={`/dashboard/resumes/${resumeId}`}
+            to={`/dashboard/resumes/${job.id}`}
             className="text-indigo-600 hover:underline"
           >
             Open Resume
@@ -73,7 +76,7 @@ const JobItems = ({ status, companyName, resume, coverLetter }) => {
         </td>
         <td className="px-6 py-4">
           <Link 
-            to={`/dashboard/cover-letters/${coverLetterId}`}
+            to={`/dashboard/cover-letters/${job.id}`}
             className="text-indigo-600 hover:underline"
           >
             Open Cover Letter
@@ -87,6 +90,7 @@ const JobItems = ({ status, companyName, resume, coverLetter }) => {
     );
   };
   
+
   export default JobItems;
   
   

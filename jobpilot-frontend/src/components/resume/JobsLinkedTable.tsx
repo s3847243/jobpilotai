@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const JobsLinkedTable = ({ jobs }) => {
+import { Props } from '../job-applications/JobTable';
+const JobsLinkedTable: React.FC<Props>  = ({ jobs }) => {
   const navigate = useNavigate();
 
   return (
