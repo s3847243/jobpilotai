@@ -2,14 +2,17 @@ package com.example.jobpilot.job.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -122,7 +125,10 @@ public class JobController {
         Job job = jobService.addManualJob(request, user);
         return ResponseEntity.ok(job);
     }
-
+    @CrossOrigin(
+    origins = "http://localhost:5173",
+    allowCredentials = "true"
+    )
     @PostMapping("/{jobId}/generate-cover-letter")
     public ResponseEntity<CoverLetterResponse> generateCoverLetter(
             @PathVariable UUID jobId,
@@ -147,5 +153,29 @@ public class JobController {
 
         return ResponseEntity.ok(new CoverLetterResponse(job.getCoverLetter()));
     }
+    @PutMapping("/{jobId}/cover-letter")
+    public ResponseEntity<Job> updateCoverLetter(
+            @PathVariable UUID jobId,
+            @RequestBody String newCoverLetter
+    ) {
+        Job updated = jobService.updateCoverLetter(jobId, newCoverLetter);
+        return ResponseEntity.ok(updated);
+    }
+    @CrossOrigin(
+    origins = "http://localhost:5173",
+    allowCredentials = "true"
+    )
+    @PostMapping("/{jobId}/improve-cover-letter")
+    public ResponseEntity<String> improveCoverLetter(
+            @PathVariable UUID jobId,
+            @RequestBody Map<String, String> payload
+    ) {
+        String instruction = payload.get("instruction");
+        if (instruction == null || instruction.isBlank()) {
+            return ResponseEntity.badRequest().body("Instruction is required");
+        }
 
+        String improvedText = jobService.improveCoverLetter(jobId, instruction);
+        return ResponseEntity.ok(improvedText);
+    }
 }

@@ -153,4 +153,26 @@ public class OpenAiService {
             throw new RuntimeException("Failed to parse OpenAI response as JSON", e);
         }
     }
+    public String improveText(String currentText, String instruction) {
+        String prompt = String.format(
+            """
+            You are a professional job application assistant.
+    
+            Below is the current cover letter:
+    
+            ---
+            %s
+            ---
+    
+            Improve the above cover letter based on the following instruction:
+            "%s"
+    
+            Provide a rewritten version only. Keep it professional and relevant to job applications.
+            """,
+            currentText,
+            instruction
+        );
+    
+        return getRawResponse(prompt);
+    }
 }

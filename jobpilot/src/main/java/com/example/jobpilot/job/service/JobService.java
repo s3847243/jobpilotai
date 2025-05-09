@@ -176,6 +176,22 @@ public class JobService {
         job.setCoverLetter(coverLetter);
         return jobRepository.save(job);
     }
+    public Job updateCoverLetter(UUID jobId, String newCoverLetter) {
+        Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
+        job.setCoverLetter(newCoverLetter);
+        return jobRepository.save(job);
+    }
+
+    public String improveCoverLetter(UUID jobId, String userInstruction) {
+        Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
+        String currentLetter = job.getCoverLetter();
+        if (currentLetter == null || currentLetter.isBlank()) {
+            throw new RuntimeException("Cover letter is empty");
+        }
+
+        // Call OpenAI service to improve
+        return openAiService.improveText(currentLetter, userInstruction);
+    }
     
 
 

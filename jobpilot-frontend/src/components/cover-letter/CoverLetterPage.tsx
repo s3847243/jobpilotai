@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
+import { generateCoverLetter, getCoverLetter, improveCoverLetter, updateCoverLetter } from '../../api/JobApi';
 const CoverLetterPage = () => {
   const {jobId} = useParams<{ jobId: string }>();
-
-
+  const [coverLetter, setCoverLetter] = useState<string | null>(null);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const loadCoverLetter = async () => {
+      if (!jobId) return;
+      const { coverLetter } = await getCoverLetter(jobId);
+      setCoverLetter(coverLetter); // ✅ Just the string
+    };
+    loadCoverLetter();
+  }, [jobId]);
+  const handleGenerate = async () => {
+    setLoading(true);
+    const { coverLetter } = await generateCoverLetter(jobId!);
+    console.log(coverLetter);
+      setCoverLetter(coverLetter);
+    setLoading(false);
+  };
+  const handleImprove = async () => {
+    if (!input.trim()) return;
+    setLoading(true);
+    const updated = await improveCoverLetter(jobId!, input);
+    setCoverLetter(updated);
+    await updateCoverLetter(jobId!, updated); // persist
+    setInput('');
+    setLoading(false);
+  };
   return (
     <div className="flex h-[calc(100vh-64px)] bg-gray-50">
       
@@ -24,14 +49,17 @@ const CoverLetterPage = () => {
           <input
             type="text"
             placeholder="Ask for help or rewrite a section..."
-            className="w-full border px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="w-full border px-4 py-2 rounded-md shadow-sm"
           />
           <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md transition duration-200"
-            >
-              Enter
-            </button>
-          </div>
+            onClick={handleImprove}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+          >
+            Enter
+          </button>
+        </div>
       </div>
 
       {/* Right: Cover Letter Viewer */}
@@ -47,13 +75,23 @@ const CoverLetterPage = () => {
         </div>
 
         {/* Letter Preview Box */}
-        <div className="bg-white p-6 rounded-xl shadow-md overflow-y-auto h-full border">
-          <p className="text-gray-700 whitespace-pre-line leading-relaxed text-sm">
-            Dear Hiring Manager,{"\n\n"}
-            I am writing to express my interest in the Backend Engineer role at Netflix...
-            {/* Add more cover letter text here */}
-          </p>
-        </div>
+        {coverLetter ? (
+          <div className="bg-white p-6 rounded-xl shadow-md overflow-y-auto h-full border">
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed text-sm">
+              {coverLetter}
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <p>No cover letter found.</p>
+            <button
+              onClick={handleGenerate}
+              className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+            >
+              ✍️ Generate Cover Letter
+            </button>
+          </div>
+)}
       </div>
     </div>
   );
