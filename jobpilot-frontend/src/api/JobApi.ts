@@ -82,3 +82,17 @@ export const matchJobWithResume = async (jobId: string): Promise<Job> => {
   const res = await axiosInstance.get(`job/${jobId}/match`,{withCredentials: true});
   return res.data;
 };
+
+export const replaceResumeForJob = async (jobId: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await axiosInstance.put(`/job/${jobId}/resume`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    },
+    withCredentials: true
+  });
+  console.log(res.data);
+  return res.data; // updated Job object
+};

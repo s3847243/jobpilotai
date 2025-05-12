@@ -78,5 +78,27 @@ public class ResumeService {
             return stripper.getText(document);
         }
     }
+    public void deleteFile(Resume resume) {
+        if (resume == null) return;
+
+        try {
+            // Extract file key from the S3 URL
+            String s3Url = resume.getS3Url();
+            String fileKey = extractS3Key(s3Url);
+
+            // Delete file from S3
+            s3Service.deleteFile(fileKey);
+
+            // Delete resume from DB
+            resumeRepository.delete(resume);
+
+        } catch (Exception e) {
+            System.err.println("Failed to delete resume: " + e.getMessage());
+            // You may want to log this instead of printing
+        }
+    }
+    private String extractS3Key(String s3Url) {
+        return s3Url.substring(s3Url.lastIndexOf("/") + 1);
+    }
 
 }

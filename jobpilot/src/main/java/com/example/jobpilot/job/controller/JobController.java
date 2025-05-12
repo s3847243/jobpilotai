@@ -178,4 +178,16 @@ public class JobController {
         String improvedText = jobService.improveCoverLetter(jobId, instruction);
         return ResponseEntity.ok(improvedText);
     }
+
+    @PutMapping("/{jobId}/resume")
+    public ResponseEntity<Job> replaceResumeForJob(
+        @PathVariable UUID jobId,
+        @RequestParam("file") MultipartFile file,
+        HttpServletRequest request
+    ) throws IOException {
+        User user = getUserFromRequest(request);
+        Resume newResume = resumeService.uploadResume(file, user);
+        Job updatedJob = jobService.replaceResume(jobId, newResume, user);
+        return ResponseEntity.ok(updatedJob);
+    }
 }

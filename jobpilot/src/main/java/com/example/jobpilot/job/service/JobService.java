@@ -20,6 +20,7 @@ import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.model.JobStatus;
 import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.resume.model.Resume;
+import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +32,7 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
+    private final ResumeService resumeService;
     public Job addJobFromUrl(String url, User user, Resume resume) {
         try {
             // Step 1: Fetch job page
@@ -194,6 +196,23 @@ public class JobService {
     }
     
 
+    public Job replaceResume(UUID jobId, Resume newResume, User user) {
+        Job job = getJobById(jobId)
+            .orElseThrow(() -> new RuntimeException("Job not found"));
 
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+        // Delete the old resume file and DB entry
+        Resume oldResume = job.getResume();
+        resumeService.deleteFile(oldResume);
+        job.setResume(newResume);
+            // Invalidate old cover letter
+        job.setCoverLetter(null);
+        job.setMatchScore(null);
+        job.setMatchFeedback(null);
+        job.setMissingSkills(null);
+        return jobRepository.save(job);
+    }
     
 }

@@ -7,6 +7,7 @@ import { matchJobWithResume } from '../../api/JobApi';
 // import ResumeActionButtons from './ResumeActionButtons'
 import { getJobById } from '../../api/JobApi';
 import { Job } from '../../api/JobApi';
+import { replaceResumeForJob } from '../../api/JobApi';
 const ResumePage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const [job, setJob] = useState<Job | null>(null); 
@@ -37,8 +38,28 @@ useEffect(() => {
   }, [jobId]);
   if (!job) return <div>Loading...</div>;
   const handleImprove = () => { /* call improve API */ };
-  const handleReplace = () => { /* upload new resume */ };
-  const handleGenerateCoverLetter = () => { /* open cover letter modal */ };
+const handleReplace = async () => {
+  if (!jobId) return;
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".pdf";
+
+  fileInput.onchange = async (e) => {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    try {
+      const updatedJob = await replaceResumeForJob(jobId, file);
+      setJob(null); // trigger useEffect again to refetch & rematch
+    } catch (error) {
+      console.error("Failed to replace resume:", error);
+    }
+  };
+
+  fileInput.click();
+};  const handleGenerateCoverLetter = () => { /* open cover letter modal */ };
   const handleDelete = () => { /* confirm and delete resume */ };
 
         {/* <JobsLinkedTable jobs={jobs} /> */}
