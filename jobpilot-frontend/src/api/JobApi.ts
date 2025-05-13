@@ -96,3 +96,18 @@ export const replaceResumeForJob = async (jobId: string, file: File) => {
   console.log(res.data);
   return res.data; // updated Job object
 };
+
+export const updateJobStatus = async (jobId: string, status: string) => {
+  const res = await axiosInstance.patch(
+    `/job/${jobId}/status`,
+    { status },
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return res.data; 
+};

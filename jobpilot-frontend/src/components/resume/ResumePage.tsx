@@ -11,6 +11,7 @@ import { replaceResumeForJob } from '../../api/JobApi';
 const ResumePage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const [job, setJob] = useState<Job | null>(null); 
+const [reloadTrigger, setReloadTrigger] = useState(0);
 
 useEffect(() => {
     const fetchAndMatchJob = async () => {
@@ -35,7 +36,7 @@ useEffect(() => {
     };
 
     fetchAndMatchJob();
-  }, [jobId]);
+  }, [jobId, reloadTrigger]);
   if (!job) return <div>Loading...</div>;
   const handleImprove = () => { /* call improve API */ };
 const handleReplace = async () => {
@@ -53,6 +54,7 @@ const handleReplace = async () => {
     try {
       const updatedJob = await replaceResumeForJob(jobId, file);
       setJob(null); // trigger useEffect again to refetch & rematch
+      setReloadTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Failed to replace resume:", error);
     }

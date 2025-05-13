@@ -2,17 +2,25 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Resume } from './JobApp';
 import { Job } from './JobApp';
+import { updateJobStatus } from '../../api/JobApi';
 type Props = {
   job: Job;
 };
 const JobItems:React.FC<Props> = ({ job }) => {
   const coverLetterId = "asd";
   const [open, setOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("Saved"); // <-- default option
-  const selectOption = (option: string) => {
+  const [selectedOption, setSelectedOption] = useState(job.status);
+
+  const selectOption = async (option: string) => {
+  try {
+    await updateJobStatus(job.id, option);
     setSelectedOption(option);
-    setOpen(false); // close dropdown after selecting
-  };
+  } catch (error) {
+    console.error("Failed to update job status:", error);
+  } finally {
+    setOpen(false); // Close dropdown
+  }
+};
   return (
       <tr className="border-t hover:bg-gray-50">
           <td className="px-6 py-4">
@@ -42,24 +50,15 @@ const JobItems:React.FC<Props> = ({ job }) => {
   {open && (
     <div className="absolute left-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
       <div className="py-1">
-        <div
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={() => selectOption('Saved')}
-        >
-          Saved
-        </div>
-        <div
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={() => selectOption('Applied')}
-        >
-          Applied
-        </div>
-        <div
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={() => selectOption('Rejected')}
-        >
-          Rejected
-        </div>
+        {["Saved", "Applied", "Rejected"].map((option) => (
+          <div
+            key={option}
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            onClick={() => selectOption(option)}
+          >
+            {option}
+          </div>
+        ))}
       </div>
     </div>
   )}
