@@ -20,6 +20,7 @@ import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +33,19 @@ public class ResumeController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        throw new RuntimeException("JWT token not found in cookies");
+    }
+    
     private User getUserFromRequest(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+        String token = extractTokenFromCookie(request);
         String email = jwtService.extractEmail(token);
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -49,16 +61,24 @@ public class ResumeController {
         return ResponseEntity.ok(resume);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Resume>> listResumes(HttpServletRequest request) {
-        User user = getUserFromRequest(request);
-        return ResponseEntity.ok(resumeService.getResumesByUser(user));
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteResume(@PathVariable UUID id, HttpServletRequest request) {
         User user = getUserFromRequest(request);
         resumeService.deleteResume(id, user);
         return ResponseEntity.ok("Resume deleted successfully");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Resume>> getAllResumes(HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        return ResponseEntity.ok(resumeService.getResumesByUser(user));
+    }
+
+    @GetMapping("/{resumeId}")
+    public ResponseEntity<Resume> getResume(@PathVariable UUID resumeId, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        Resume resume = resumeService.getResumeByIdForUser(resumeId, user);
+        return ResponseEntity.ok(resume);
     }
 }

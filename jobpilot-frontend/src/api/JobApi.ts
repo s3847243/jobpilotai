@@ -1,9 +1,5 @@
 import axiosInstance from './axiosInstance';
-export type Resume = {
-  id: string;
-  filename: string;
-  s3Url: string;
-};
+import { Resume } from '../types/Resume';
 export type Job = {
   id: string;
   company: string;
@@ -21,6 +17,8 @@ export type Job = {
 export const fetchJobs = async () => {
     const res = await axiosInstance.get('/job',{withCredentials: true});
     console.log(res.data);
+      console.log('Type:', typeof res.data); // This should say "object"
+
     return res.data;
 };
 export const getJobById = async (jobId: string): Promise<Job> => {
@@ -29,17 +27,13 @@ export const getJobById = async (jobId: string): Promise<Job> => {
 };
 
 // CREATE JOB (from URL + resume)
-export const createJobFromUrl = async (url:string, file:File) => {
-  const formData = new FormData();
-  formData.append('url', url);
-  formData.append('file', file);
+export const createJobFromUrl = async (url: string, resumeId?: string) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('url', url);
+  if (resumeId) queryParams.append('resumeId', resumeId);
 
-  const res = await axiosInstance.post('/job/from-url', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    withCredentials: true, 
-
+  const res = await axiosInstance.post(`/job/from-url?${queryParams.toString()}`, null, {
+    withCredentials: true,
   });
   return res.data;
 };
@@ -111,3 +105,5 @@ export const updateJobStatus = async (jobId: string, status: string) => {
 
   return res.data; 
 };
+
+

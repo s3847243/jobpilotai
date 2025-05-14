@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.user.model.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "resumes")
@@ -41,4 +43,7 @@ public class Resume {
     private String parsedSummary;
 
     private Instant uploadedAt;
+    @OneToMany(mappedBy = "resume")
+    @JsonBackReference
+    private List<Job> jobs;
 }

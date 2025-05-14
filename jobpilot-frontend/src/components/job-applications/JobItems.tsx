@@ -67,7 +67,7 @@ const JobItems:React.FC<Props> = ({ job }) => {
         <td className="px-6 py-4">{job.company}</td>
         <td className="px-6 py-4">
           <Link 
-            to={`/dashboard/resumes/${job.id}`}
+            to={`/dashboard/job/${job.id}/resume`}
             className="text-indigo-600 hover:underline"
           >
             Open Resume
@@ -75,7 +75,7 @@ const JobItems:React.FC<Props> = ({ job }) => {
         </td>
         <td className="px-6 py-4">
           <Link 
-            to={`/dashboard/cover-letters/${job.id}`}
+            to={`/dashboard/job/${job.id}/cover-letter`}
             className="text-indigo-600 hover:underline"
           >
             Open Cover Letter

@@ -67,9 +67,18 @@ public class JobController {
     }
 
     @PostMapping("/from-url")
-    public ResponseEntity<Job> addFromUrl(@RequestParam String url,@RequestParam("file") MultipartFile file,HttpServletRequest request) throws IOException{
+    public ResponseEntity<Job> addFromUrl(
+        @RequestParam String url,
+        @RequestParam(required = false) UUID resumeId,
+        HttpServletRequest request
+    ) throws IOException {
         User user = getUserFromRequest(request);
-        Resume resume = resumeService.uploadResume(file, user);
+        Resume resume = null;
+
+        if (resumeId != null) {
+            resume = resumeService.getResumeByIdForUser(resumeId, user);
+        }
+
         Job job = jobService.addJobFromUrl(url, user, resume);
         return ResponseEntity.ok(job);
     }
@@ -189,5 +198,16 @@ public class JobController {
         Resume newResume = resumeService.uploadResume(file, user);
         Job updatedJob = jobService.replaceResume(jobId, newResume, user);
         return ResponseEntity.ok(updatedJob);
+    }
+    @PutMapping("/job/{jobId}/resume")
+    public ResponseEntity<Job> assignResumeToJob(
+            @PathVariable UUID jobId,
+            @RequestParam UUID resumeId,
+            HttpServletRequest request
+    ) {
+        User user = getUserFromRequest(request);
+        Resume resume = resumeService.getResumeByIdForUser(resumeId, user);
+        Job job = jobService.assignResume(jobId, resume, user);
+        return ResponseEntity.ok(job);
     }
 }

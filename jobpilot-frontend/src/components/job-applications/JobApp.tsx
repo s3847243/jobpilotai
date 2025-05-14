@@ -4,6 +4,8 @@ import JobItems from './JobItems';
 import JobTable from './JobTable';
 import { createJobFromUrl } from '../../api/JobApi';
 import { fetchJobs } from '../../api/JobApi';
+import { fetchResumes } from '../../api/ResumeApi';
+import { Resume } from '../../types/Resume';
 export type Job = {
   id: string;
   status: string;
@@ -17,16 +19,14 @@ export type Job = {
   title:string;
   url:string;
 };
-export type Resume = {
-  id: string;
-  filename: string;
-  s3Url: string;
-};
+
 const JobApp = () => {
       const [jobs , setJobs] = useState<Job[]>([]);
       const [isOpen, setIsOpen] = useState(false);
       const [jobUrl, setJobUrl] = useState('');
       const [resumeFile, setResumeFile] = useState<File | null>(null);
+        const [resumes, setResumes] = useState<Resume[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState<string>('');
       useEffect(() => {
         const loadJobs = async () => {
           try {
@@ -36,21 +36,22 @@ const JobApp = () => {
             console.error('Error fetching jobs:', error);
           }
         };
-
+        const loadResumes = async () => {
+          const resumeList = await fetchResumes();
+          setResumes(resumeList);
+        };
         loadJobs();
+        loadResumes();
+
       }, []);
-      const handleSubmit = async (e:any) => {
+      const handleSubmit = async (e: any) => {
         e.preventDefault();
-        if (!resumeFile) return;
-      
+
         try {
-          const newJob = await createJobFromUrl(jobUrl, resumeFile);
-          console.log(newJob);
-          // Optional: If the API returns a new job object, append it
+          const newJob = await createJobFromUrl(jobUrl, selectedResumeId); // selectedResumeId may be ""
           setJobs(prev => [...prev, newJob]);
-      
           setJobUrl('');
-          setResumeFile(null);
+          setSelectedResumeId('');
           setIsOpen(false);
         } catch (error) {
           console.error('Error creating job:', error);
@@ -97,18 +98,20 @@ const JobApp = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Resume (PDF)</label>
-                    <input
-                      type="file"
-                      accept=".pdf"
+                    <label className="block text-sm font-medium mb-1">Select Resume</label>
+                    <select
                       required
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                          setResumeFile(e.target.files[0]);
-                        }
-                      }}
-                      className="w-full"
-                    />
+                      value={selectedResumeId}
+                      onChange={(e) => setSelectedResumeId(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    >
+                      <option value="">-- Choose a resume --</option>
+                      {resumes.map(resume => (
+                        <option key={resume.id} value={resume.id}>
+                          {resume.filename}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <button
                     type="submit"
@@ -118,6 +121,11 @@ const JobApp = () => {
                   </button>
                 </form>
               </div>
+              {resumes.length === 0 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  You haven’t uploaded any resumes yet. You can still create a job and assign a resume later.
+                </p>
+              )}
             </div>
           )}
         </section>

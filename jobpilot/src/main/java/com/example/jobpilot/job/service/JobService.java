@@ -214,5 +214,21 @@ public class JobService {
         job.setMissingSkills(null);
         return jobRepository.save(job);
     }
+    public Job assignResume(UUID jobId, Resume resume, User user) {
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        job.setResume(resume);
+        job.setCoverLetter(null); // Invalidate old cover letter
+        job.setMatchScore(null);
+        job.setMatchFeedback(null);
+        job.setMissingSkills(null);
+
+        return jobRepository.save(job);
+    }
     
 }

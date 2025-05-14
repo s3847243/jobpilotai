@@ -45,8 +45,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+
+                        System.out.println("🔍 Filter triggered for: " + request.getRequestURI());
+
+                        if (token != null) {
+                            System.out.println("✅ JWT found, extracted email: " + email);
+                        }
             }
         }
+
 
         filterChain.doFilter(request, response);
     }
@@ -55,6 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 1. First try Authorization header
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
+            System.out.println("🔐 Token from Authorization header");
             return header.substring(7);
         }
 
@@ -62,6 +70,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
+                                    System.out.println("🍪 Token from Cookie");
+
                     return cookie.getValue();
                 }
             }

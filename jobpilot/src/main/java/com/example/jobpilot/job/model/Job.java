@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.user.model.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -16,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +51,8 @@ public class Job {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "resume_id")
+    @JoinColumn(name = "resume_id", nullable = true)
+    @JsonManagedReference // serialize here not in resume 
     private Resume resume;
     @ElementCollection
     private List<String> requiredSkills;
@@ -68,4 +71,5 @@ public class Job {
     private List<String> missingSkills;
     @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
     private String coverLetter;
+    
 }

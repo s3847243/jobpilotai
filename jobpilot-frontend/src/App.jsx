@@ -16,10 +16,20 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
           <Route path="job-hub" element={<JobApp />} />
-          <Route path="resumes" element={<ResumeApp />} />
-          <Route path="cover-letters/:jobId" element={<CoverLetterPage />} />
-          <Route path="resumes/:jobId" element={<ResumePage />} />
+          <Route path="resumes" element={<ResumeApp />} />   // my resumes still needs to be implemented
+          <Route path="job/:jobId/cover-letter" element={<CoverLetterPage />} />
+          <Route path="job/:jobId/resume" element={<ResumePage />} />
+          {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}
+
+          {/* Jobs */}
+          {/* <Route path="job/:jobId/assign-resume" element={<AssignResumePage />} /> // Select existing resume */}
+
+          {/* Resumes */}
+          {/* <Route path="resumes/view/:resumeId" element={<ResumeOnlyPage />} /> // Standalone resume view */}
         </Route>
+
+
+
 
         <Route path="*" element={<p>404 Page Not Found</p>} />
       </Routes>

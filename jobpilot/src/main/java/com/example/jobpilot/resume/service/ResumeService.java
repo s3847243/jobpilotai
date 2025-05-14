@@ -101,4 +101,15 @@ public class ResumeService {
         return s3Url.substring(s3Url.lastIndexOf("/") + 1);
     }
 
+    public Resume getResumeByIdForUser(UUID resumeId, User user) {
+    Resume resume = resumeRepository.findById(resumeId)
+            .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        if (!resume.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Access denied to this resume");
+        }
+
+        return resume;
+    }
+
 }
