@@ -30,27 +30,25 @@ public class CoverLetterService {
     private final CoverLetterRepository coverLetterRepository;
 
 @Transactional
-public CoverLetterResponse generateCoverLetter(CoverLetterRequest request) {
-    Resume resume = resumeRepository.findById(request.getResumeId())
+public CoverLetterResponse generateCoverLetter(CoverLetterRequest request,User user) {
+Resume resume = resumeRepository.findById(request.getResumeId())
             .orElseThrow(() -> new RuntimeException("Resume not found"));
 
     Job job = jobRepository.findById(request.getJobId())
             .orElseThrow(() -> new RuntimeException("Job not found"));
 
     String coverLetterText = openAiService.generateCoverLetter(
-            resume.getParsedSummary() != null ? resume.getParsedSummary() : "No summary available.",
+            resume.getParsedSummary(),
             job.getTitle(),
             job.getCompany(),
             job.getDescription()
     );
 
-    CoverLetter coverLetter = CoverLetter.builder()
-            .content(coverLetterText)
-            .job(job)
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
-
+    CoverLetter coverLetter = new CoverLetter();
+    coverLetter.setUser(user); // ✅ This was missing
+    coverLetter.setJob(job);
+    coverLetter.setContent(coverLetterText);
+    coverLetter.setCreatedAt(Instant.now());
     coverLetterRepository.save(coverLetter);
 
     return new CoverLetterResponse(coverLetterText);
@@ -115,5 +113,17 @@ public CoverLetterResponse generateCoverLetter(CoverLetterRequest request) {
     }
 
     return coverLetter;
+    }
+    
+    public CoverLetter getCoverLetterByJobId(UUID jobId, User user) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized access to job cover letter");
+        }
+
+        return coverLetterRepository.findByJob(job)
+                .orElseThrow(() -> new RuntimeException("Cover letter not found for this job"));
     }
 }

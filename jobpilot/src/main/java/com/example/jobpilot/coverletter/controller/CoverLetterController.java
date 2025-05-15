@@ -57,7 +57,7 @@ public class CoverLetterController {
         User user = getUserFromRequest(request);
         return ResponseEntity.ok(coverLetterService.getAllCoverLettersByUser(user));
     }
-
+    @GetMapping("/{coverLetterId}")
     public ResponseEntity<CoverLetter> getCoverLetterById(@PathVariable UUID coverLetterId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
         return ResponseEntity.ok(coverLetterService.getCoverLetterByIdForUser(coverLetterId, user));
@@ -70,7 +70,7 @@ public class CoverLetterController {
             HttpServletRequest httpRequest
     ) {
         User user = getUserFromRequest(httpRequest);
-        CoverLetterResponse response = coverLetterService.generateCoverLetter(request);
+        CoverLetterResponse response = coverLetterService.generateCoverLetter(request,user);
         return ResponseEntity.ok(response);
     }
 
@@ -105,4 +105,15 @@ public class CoverLetterController {
 
         return ResponseEntity.ok(coverLetterService.updateCoverLetter(coverLetterId, newText, user));
     }
+
+    @GetMapping("/job/{jobId}")
+    public ResponseEntity<CoverLetterResponse> getCoverLetterByJobId(
+            @PathVariable UUID jobId,
+            HttpServletRequest request
+    ) {
+        User user = getUserFromRequest(request);
+        CoverLetter coverLetter = coverLetterService.getCoverLetterByJobId(jobId, user);
+        return ResponseEntity.ok(new CoverLetterResponse(coverLetter.getContent()));
+    }
+
 }

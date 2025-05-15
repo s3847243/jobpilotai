@@ -1,24 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { generateCoverLetter, getCoverLetter, improveCoverLetter, updateCoverLetter } from '../../api/JobApi';
+import { generateCoverLetter,improveCoverLetter,getCoverLetterById, getCoverLetterByJobId } from '../../api/CoverLetterApi';
+import { getJobById, Job } from '../../api/JobApi';
 const CoverLetterPage = () => {
   const {jobId} = useParams<{ jobId: string }>();
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const[job, setJob] = useState<Job>();
+  // useEffect(() => {
+  //   const loadCoverLetter = async () => {
+  //     if (!jobId) return;
+  //     const currentJob = await getJobById(jobId);
+  //     setJob(currentJob);
+  //     const { coverLetter } = await getCoverLetterByJobId(jobId);
+  //     setCoverLetter(coverLetter); 
+  //   };
+  //   loadCoverLetter();
+  // }, [jobId]);
   useEffect(() => {
     const loadCoverLetter = async () => {
       if (!jobId) return;
-      const { coverLetter } = await getCoverLetter(jobId);
-      setCoverLetter(coverLetter); // ✅ Just the string
+
+      try {
+        const currentJob = await getJobById(jobId);
+        setJob(currentJob);
+
+        // Only fetch cover letter if job has one
+        if (currentJob.coverLetter) {
+          const { coverLetter } = await getCoverLetterByJobId(jobId);
+          setCoverLetter(coverLetter);
+        } else {
+          setCoverLetter(null); // No cover letter yet
+        }
+
+      } catch (error) {
+        console.error("Failed to load job or cover letter:", error);
+      }
     };
+
     loadCoverLetter();
   }, [jobId]);
   const handleGenerate = async () => {
+    if (!job || !job.resume?.id) {
+      alert("No resume found for this job.");
+      return;
+    }
+
     setLoading(true);
-    const { coverLetter } = await generateCoverLetter(jobId!);
-    console.log(coverLetter);
-      setCoverLetter(coverLetter);
+    try {
+      const data = await generateCoverLetter(job.id, job.resume.id);
+      setCoverLetter(data.text);
+    } catch (err) {
+      console.error("Failed to generate cover letter", err);
+    }
     setLoading(false);
   };
   const handleImprove = async () => {
@@ -26,7 +61,7 @@ const CoverLetterPage = () => {
     setLoading(true);
     const updated = await improveCoverLetter(jobId!, input);
     setCoverLetter(updated);
-    await updateCoverLetter(jobId!, updated); // persist
+    // await updateCoverLetter(jobId!, updated); // persist
     setInput('');
     setLoading(false);
   };
