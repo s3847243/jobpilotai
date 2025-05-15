@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.jobpilot.coverletter.model.CoverLetter;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -18,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,7 +72,10 @@ public class Job {
     private String matchFeedback;   
     @ElementCollection
     private List<String> missingSkills;
-    @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
-    private String coverLetter;
+    // @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
+    // private String coverLetter;
+
+    @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CoverLetter coverLetter;
     
 }

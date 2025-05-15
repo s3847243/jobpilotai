@@ -1,15 +1,23 @@
 package com.example.jobpilot.coverletter.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.coverletter.dto.CoverLetterRequest;
 import com.example.jobpilot.coverletter.dto.CoverLetterResponse;
+import com.example.jobpilot.coverletter.model.CoverLetter;
+import com.example.jobpilot.coverletter.repository.CoverLetterRepository;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.resume.repository.ResumeRepository;
+import com.example.jobpilot.user.model.User;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,46 +27,93 @@ public class CoverLetterService {
     private final ResumeRepository resumeRepository;
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
+    private final CoverLetterRepository coverLetterRepository;
 
-    public CoverLetterResponse generateCoverLetter(CoverLetterRequest request) {
-        Resume resume = resumeRepository.findById(request.getResumeId())
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+@Transactional
+public CoverLetterResponse generateCoverLetter(CoverLetterRequest request) {
+    Resume resume = resumeRepository.findById(request.getResumeId())
+            .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-        Job job = jobRepository.findById(request.getJobId())
+    Job job = jobRepository.findById(request.getJobId())
+            .orElseThrow(() -> new RuntimeException("Job not found"));
+
+    String coverLetterText = openAiService.generateCoverLetter(
+            resume.getParsedSummary() != null ? resume.getParsedSummary() : "No summary available.",
+            job.getTitle(),
+            job.getCompany(),
+            job.getDescription()
+    );
+
+    CoverLetter coverLetter = CoverLetter.builder()
+            .content(coverLetterText)
+            .job(job)
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+    coverLetterRepository.save(coverLetter);
+
+    return new CoverLetterResponse(coverLetterText);
+}
+    public List<CoverLetter> getAllCoverLettersByUser(User user) {
+        return coverLetterRepository.findAllByJobUser(user);
+    }
+
+    public CoverLetterResponse getCoverLetter(UUID jobId, User user) {
+        Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        String prompt = """
-            You are an expert career coach and recruiter.
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized access to cover letter");
+        }
 
-            Write a personalized and professional cover letter for the following:
+        CoverLetter letter = coverLetterRepository.findByJob(job)
+                .orElseThrow(() -> new RuntimeException("Cover letter not found"));
 
-            Resume Summary:
-            %s
+        return new CoverLetterResponse(letter.getContent());
+    }
 
-            Job Title:
-            %s
+    @Transactional
+    public CoverLetter updateCoverLetter(UUID jobId, String newContent, User user) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
 
-            Company:
-            %s
+        CoverLetter coverLetter = coverLetterRepository.findByJob(job)
+                .orElseThrow(() -> new RuntimeException("Cover letter not found"));
 
-            Job Description:
-            %s
+        coverLetter.setContent(newContent);
+        coverLetter.setCreatedAt(Instant.now());
+        return coverLetterRepository.save(coverLetter);
+    }
 
-            Tone: Formal and enthusiastic
-            Length: No more than 300 words
-            Format: No header (no name/contact), just the letter body.
-            """.formatted(
-                resume.getParsedSummary() != null ? resume.getParsedSummary() : "No summary available.",
-                job.getTitle(),
-                job.getCompany(),
-                job.getDescription()
-            );
+    public String improveCoverLetter(UUID jobId, String instruction, User user) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        String coverLetterText = openAiService.getRawResponse(prompt);
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
 
-        CoverLetterResponse response = new CoverLetterResponse();
-        response.setCoverLetterText(coverLetterText);
+        CoverLetter letter = coverLetterRepository.findByJob(job)
+                .orElseThrow(() -> new RuntimeException("Cover letter not found"));
 
-        return response;
+        String improved = openAiService.improveText(letter.getContent(), instruction);
+        letter.setContent(improved);
+        coverLetterRepository.save(letter);
+        return improved;
+    }
+    public CoverLetter getCoverLetterByIdForUser(UUID coverLetterId, User user) {
+    CoverLetter coverLetter = coverLetterRepository.findById(coverLetterId)
+        .orElseThrow(() -> new RuntimeException("Cover letter not found"));
+
+    // Ensure it belongs to the requesting user via the job
+    if (!coverLetter.getJob().getUser().getUserId().equals(user.getUserId())) {
+        throw new RuntimeException("Unauthorized access to this cover letter");
+    }
+
+    return coverLetter;
     }
 }

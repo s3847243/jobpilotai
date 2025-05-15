@@ -155,45 +155,45 @@ public class JobService {
 
     return jobRepository.save(job);
     }   
-    public Job generateAndStoreCoverLetter(UUID jobId, User user) {
-        Job job = getJobById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+    // public Job generateAndStoreCoverLetter(UUID jobId, User user) {
+    //     Job job = getJobById(jobId)
+    //             .orElseThrow(() -> new RuntimeException("Job not found"));
     
-        if (!job.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized");
-        }
+    //     if (!job.getUser().getUserId().equals(user.getUserId())) {
+    //         throw new RuntimeException("Unauthorized");
+    //     }
     
-        Resume resume = job.getResume();
-        if (resume == null) {
-            throw new RuntimeException("Resume not found for job");
-        }
+    //     Resume resume = job.getResume();
+    //     if (resume == null) {
+    //         throw new RuntimeException("Resume not found for job");
+    //     }
     
-        String coverLetter = openAiService.generateCoverLetter(
-                resume.getParsedSummary(),
-                job.getTitle(),
-                job.getCompany(),
-                job.getDescription()
-        );
+    //     String coverLetter = openAiService.generateCoverLetter(
+    //             resume.getParsedSummary(),
+    //             job.getTitle(),
+    //             job.getCompany(),
+    //             job.getDescription()
+    //     );
     
-        job.setCoverLetter(coverLetter);
-        return jobRepository.save(job);
-    }
-    public Job updateCoverLetter(UUID jobId, String newCoverLetter) {
-        Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
-        job.setCoverLetter(newCoverLetter);
-        return jobRepository.save(job);
-    }
+    //     job.setCoverLetter(coverLetter);
+    //     return jobRepository.save(job);
+    // }
+    // public Job updateCoverLetter(UUID jobId, String newCoverLetter) {
+    //     Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
+    //     job.setCoverLetter(newCoverLetter);
+    //     return jobRepository.save(job);
+    // }
 
-    public String improveCoverLetter(UUID jobId, String userInstruction) {
-        Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
-        String currentLetter = job.getCoverLetter();
-        if (currentLetter == null || currentLetter.isBlank()) {
-            throw new RuntimeException("Cover letter is empty");
-        }
+    // public String improveCoverLetter(UUID jobId, String userInstruction) {
+    //     Job job = getJobById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));;
+    //     String currentLetter = job.getCoverLetter();
+    //     if (currentLetter == null || currentLetter.isBlank()) {
+    //         throw new RuntimeException("Cover letter is empty");
+    //     }
 
-        // Call OpenAI service to improve
-        return openAiService.improveText(currentLetter, userInstruction);
-    }
+    //     // Call OpenAI service to improve
+    //     return openAiService.improveText(currentLetter, userInstruction);
+    // }
     
 
     public Job replaceResume(UUID jobId, Resume newResume, User user) {

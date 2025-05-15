@@ -134,59 +134,55 @@ public class JobController {
         Job job = jobService.addManualJob(request, user);
         return ResponseEntity.ok(job);
     }
-    @CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-    )
-    @PostMapping("/{jobId}/generate-cover-letter")
-    public ResponseEntity<CoverLetterResponse> generateCoverLetter(
-            @PathVariable UUID jobId,
-            HttpServletRequest request
-    ) 
-    {
-        User user = getUserFromRequest(request);
-        Job updatedJob = jobService.generateAndStoreCoverLetter(jobId, user);
-        return ResponseEntity.ok(new CoverLetterResponse(updatedJob.getCoverLetter()));
-    }
+    // @CrossOrigin(
+    // origins = "http://localhost:5173",
+    // allowCredentials = "true"
+    // )
+    // @PostMapping("/{jobId}/generate-cover-letter")
+    // public ResponseEntity<CoverLetterResponse> generateCoverLetter(
+    //         @PathVariable UUID jobId,
+    //         HttpServletRequest request
+    // ) 
+    // {
+    //     User user = getUserFromRequest(request);
+    //     Job updatedJob = jobService.generateAndStoreCoverLetter(jobId, user);
+    //     return ResponseEntity.ok(new CoverLetterResponse(updatedJob.getCoverLetter()));
+    // }
 
 
-    @GetMapping("/{jobId}/cover-letter")
-    public ResponseEntity<CoverLetterResponse> getCoverLetter(@PathVariable UUID jobId, HttpServletRequest request) {
-        User user = getUserFromRequest(request);
-        Job job = jobService.getJobById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+    // @GetMapping("/{jobId}/cover-letter")
+    // public ResponseEntity<CoverLetterResponse> getCoverLetter(@PathVariable UUID jobId, HttpServletRequest request) {
+    //     User user = getUserFromRequest(request);
+    //     Job job = jobService.getJobById(jobId)
+    //             .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        if (!job.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized");
-        }
+    //     if (!job.getUser().getUserId().equals(user.getUserId())) {
+    //         throw new RuntimeException("Unauthorized");
+    //     }
 
-        return ResponseEntity.ok(new CoverLetterResponse(job.getCoverLetter()));
-    }
-    @PutMapping("/{jobId}/cover-letter")
-    public ResponseEntity<Job> updateCoverLetter(
-            @PathVariable UUID jobId,
-            @RequestBody String newCoverLetter
-    ) {
-        Job updated = jobService.updateCoverLetter(jobId, newCoverLetter);
-        return ResponseEntity.ok(updated);
-    }
-    @CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-    )
-    @PostMapping("/{jobId}/improve-cover-letter")
-    public ResponseEntity<String> improveCoverLetter(
-            @PathVariable UUID jobId,
-            @RequestBody Map<String, String> payload
-    ) {
-        String instruction = payload.get("instruction");
-        if (instruction == null || instruction.isBlank()) {
-            return ResponseEntity.badRequest().body("Instruction is required");
-        }
+    //     return ResponseEntity.ok(new CoverLetterResponse(job.getCoverLetter()));
+    // }
+    // @PutMapping("/{jobId}/cover-letter")
+    // public ResponseEntity<Job> updateCoverLetter(
+    //         @PathVariable UUID jobId,
+    //         @RequestBody String newCoverLetter
+    // ) {
+    //     Job updated = jobService.updateCoverLetter(jobId, newCoverLetter);
+    //     return ResponseEntity.ok(updated);
+    // }
+    // @PostMapping("/{jobId}/improve-cover-letter")
+    // public ResponseEntity<String> improveCoverLetter(
+    //         @PathVariable UUID jobId,
+    //         @RequestBody Map<String, String> payload
+    // ) {
+    //     String instruction = payload.get("instruction");
+    //     if (instruction == null || instruction.isBlank()) {
+    //         return ResponseEntity.badRequest().body("Instruction is required");
+    //     }
 
-        String improvedText = jobService.improveCoverLetter(jobId, instruction);
-        return ResponseEntity.ok(improvedText);
-    }
+    //     String improvedText = jobService.improveCoverLetter(jobId, instruction);
+    //     return ResponseEntity.ok(improvedText);
+    // }
 
     @PutMapping("/{jobId}/resume")
     public ResponseEntity<Job> replaceResumeForJob(
@@ -210,4 +206,10 @@ public class JobController {
         Job job = jobService.assignResume(jobId, resume, user);
         return ResponseEntity.ok(job);
     }
+    // @GetMapping("/cover-letters")
+    // public ResponseEntity<List<Job>> getAllJobsWithCoverLetters(HttpServletRequest request) {
+    //     User user = getUserFromRequest(request);
+    //     // List<Job> jobsWithCL = jobRepository.findByUserAndCoverLetterIsNotNull(user);
+    //     // return ResponseEntity.ok(jobsWithCL);
+    // }
 }

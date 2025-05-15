@@ -119,13 +119,14 @@ const JobApp = () => {
                   >
                     Submit Application
                   </button>
+                  {resumes.length && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      If you haven't uploaded your preferred resume, you can still create a job and assign a resume later.
+                    </p>
+                  )}
                 </form>
               </div>
-              {resumes.length === 0 && (
-                <p className="text-sm text-gray-500 mt-1">
-                  You haven’t uploaded any resumes yet. You can still create a job and assign a resume later.
-                </p>
-              )}
+              
             </div>
           )}
         </section>
