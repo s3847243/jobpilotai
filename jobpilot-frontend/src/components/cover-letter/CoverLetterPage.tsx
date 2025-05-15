@@ -28,8 +28,8 @@ const CoverLetterPage = () => {
 
         // Only fetch cover letter if job has one
         if (currentJob.coverLetter) {
-          const { coverLetter } = await getCoverLetterByJobId(jobId);
-          setCoverLetter(coverLetter);
+          const { coverLetterText } = await getCoverLetterByJobId(jobId);
+          setCoverLetter(coverLetterText);
         } else {
           setCoverLetter(null); // No cover letter yet
         }
@@ -50,7 +50,9 @@ const CoverLetterPage = () => {
     setLoading(true);
     try {
       const data = await generateCoverLetter(job.id, job.resume.id);
-      setCoverLetter(data.text);
+      console.log(data);
+
+      setCoverLetter(data.coverLetterText);
     } catch (err) {
       console.error("Failed to generate cover letter", err);
     }

@@ -20,6 +20,8 @@ export const generateCoverLetter = async (jobId: string, resumeId: string) => {
     { jobId, resumeId }, // ✅ CoverLetterRequest DTO
     { withCredentials: true }
   );
+  console.log(res.data);
+
   return res.data; // returns { id, text, ... }
 };
 
@@ -28,10 +30,11 @@ export const improveCoverLetter = async (
   instruction: string
 ): Promise<string> => {
   const res = await axiosInstance.post(
-    `/cover-letters/improve/${coverLetterId}`,
+    `/cover-letters/${coverLetterId}/improve`,
     { instruction },
     { withCredentials: true }
   );
+  console.log(res.data);
   return res.data; // improved text
 };
 

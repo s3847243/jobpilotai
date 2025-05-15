@@ -77,7 +77,6 @@ public class Job {
     // private String coverLetter;
 
     @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private CoverLetter coverLetter;
     
 }
