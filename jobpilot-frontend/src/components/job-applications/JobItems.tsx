@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
-import { Resume } from './JobApp';
 import { Job } from './JobApp';
 import { updateJobStatus } from '../../api/JobApi';
 type Props = {

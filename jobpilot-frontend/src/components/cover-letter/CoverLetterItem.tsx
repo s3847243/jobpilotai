@@ -1,31 +1,34 @@
-import { Edit3 } from 'lucide-react';
-import React from 'react'
 
-const CoverLetterItem = ({ name, date }) => {
+import { Edit3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const CoverLetterItem = ({ id, title, company, date }: {
+  id: string;
+  title: string;
+  company: string;
+  date: string;
+}) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md flex flex-col gap-4 w-full max-w-sm">
-      {/* Top Section */}
       <div className="flex items-start justify-between">
-        <h2 className="text-lg font-semibold break-words">{name}</h2>
-        <button className="text-gray-400 hover:text-gray-600">
-          &#8942; {/* 3 vertical dots */}
-        </button>
+        <h2 className="text-lg font-semibold break-words">{title}</h2>
+        <button className="text-gray-400 hover:text-gray-600">&#8942;</button>
       </div>
+      <p className="text-sm text-gray-500">{company}</p>
+      <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">
+        {new Date(date).toLocaleDateString()}
+      </span>
 
-      {/* Date */}
-      <div>
-        <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">
-          {date}
-        </span>
-      </div>
-
-      {/* Button */}
-      <button className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full w-full">
+      <Link
+        to={`/dashboard/job/${id}/cover-letter`}
+        className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full w-full"
+      >
         <Edit3 size={18} />
         Open
-      </button>
+      </Link>
     </div>
   );
 };
 
-export default CoverLetterItem
+export default CoverLetterItem;
+

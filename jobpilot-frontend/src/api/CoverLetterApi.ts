@@ -1,4 +1,5 @@
 // src/api/CoverLetterApi.ts
+import { CoverLetters } from "../types/CoverLetter";
 import axiosInstance from "./axiosInstance"; // your configured Axios baseURL instance
 
 // create custom hooks for this api
@@ -34,7 +35,6 @@ export const improveCoverLetter = async (
     { instruction },
     { withCredentials: true }
   );
-  console.log(res.data);
   return res.data; // improved text
 };
 
@@ -44,8 +44,9 @@ export const getCoverLetterById = async (coverLetterId: string): Promise<CoverLe
 };
 
 
-export const getAllCoverLetters = async (): Promise<CoverLetterResponse[]> => {
+export const fetchCoverLetters = async (): Promise<CoverLetters[]> => {
   const res = await axiosInstance.get("/cover-letters", { withCredentials: true });
+  console.log(res.data);
   return res.data;
 };
 

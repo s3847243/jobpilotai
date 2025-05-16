@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.user.model.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -38,7 +39,7 @@ public class CoverLetter {
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", unique = true, nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Job job;
     @Column(length = 5000)
     private String content;

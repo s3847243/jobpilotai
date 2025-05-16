@@ -6,6 +6,7 @@ import ResumeApp from './components/resume/ResumeApp';
 import JobApp from './components/job-applications/JobApp';
 import Home from './pages/Home';
 import Login from './pages/Login'
+import CoverLetter from './components/cover-letter/CoverLetter'
 function App() {
   return (
     <BrowserRouter>
@@ -19,6 +20,7 @@ function App() {
           <Route path="resumes" element={<ResumeApp />} />   // my resumes still needs to be implemented
           <Route path="job/:jobId/cover-letter" element={<CoverLetterPage />} />
           <Route path="job/:jobId/resume" element={<ResumePage />} />
+          <Route path="cover-letters" element={<CoverLetter />} /> 
           {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}
 
           {/* Jobs */}

@@ -14,7 +14,7 @@ const DashboardLayout = () => {
       <Sidebar>
             <SidebarItem icon={<BarChart3 size={20}  />} text="Job Applications" to="/dashboard/job-hub"  />
             <SidebarItem icon={<File size={20}  />} text="Resumes" to="/dashboard/resumes" />
-            <SidebarItem icon={<Edit size={20}  />} text="Cover letters" to="/dashboard/resumes" />
+            <SidebarItem icon={<Edit size={20}  />} text="Cover letters" to="/dashboard/cover-letters" />
             <SidebarItem icon={<PersonStanding size={20}  />} text="Job Interviews" to="/dashboard/job-hub" />
             <SidebarItem icon={<BarChart3 size={20}  />} text="Follow Up Email" to="/dashboard/job-hub"  />
             <hr className='my-3'/>

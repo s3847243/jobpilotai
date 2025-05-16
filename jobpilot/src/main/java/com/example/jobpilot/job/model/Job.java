@@ -75,7 +75,7 @@ public class Job {
     private List<String> missingSkills;
     // @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
     // private String coverLetter;
-
+    @JsonManagedReference // serialize here not in resume 
     @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private CoverLetter coverLetter;
     
