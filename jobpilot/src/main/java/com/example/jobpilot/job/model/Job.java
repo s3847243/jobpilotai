@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.jobpilot.coverletter.model.CoverLetter;
+import com.example.jobpilot.followup.model.FollowUpEmail;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -79,4 +80,7 @@ public class Job {
     @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private CoverLetter coverLetter;
     
+    @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private FollowUpEmail followUpEmail;
+
 }
