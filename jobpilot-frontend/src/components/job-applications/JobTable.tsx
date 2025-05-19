@@ -14,6 +14,7 @@ const JobTable: React.FC<Props>  = ({ jobs }) => {
             <th className="px-6 py-3 text-left text-sm font-semibold">Company Name</th>
             <th className="px-6 py-3 text-left text-sm font-semibold">Resume</th>
             <th className="px-6 py-3 text-left text-sm font-semibold">Cover Letter</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold">Follow Up Email</th>
             <th className="px-6 py-3 text-left text-sm font-semibold">Delete</th>
           </tr>
         </thead>

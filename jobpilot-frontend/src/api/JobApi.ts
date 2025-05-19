@@ -1,5 +1,6 @@
 import axiosInstance from './axiosInstance';
 import { Resume } from '../types/Resume';
+import { FollowUpEmail } from '../types/FollowUpEmail';
 export type Job = {
   id: string;
   company: string;
@@ -7,8 +8,9 @@ export type Job = {
   url: string;
   status: string;
   location: string;
-  resume: Resume | null;
-  coverLetter: string | null;
+  resumeId: string | null;
+  coverLetterId: string | null;
+  followUpEmailId: string | null;
   matchScore: number | null;
   matchFeedback: string | null;
   missingSkills: string[] | null;

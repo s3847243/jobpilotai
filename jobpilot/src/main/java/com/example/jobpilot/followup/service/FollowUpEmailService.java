@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.ai.service.OpenAiService;
+import com.example.jobpilot.followup.dto.FollowUpEmailDTO;
+import com.example.jobpilot.followup.mappers.FollowUpEmailMapper;
 import com.example.jobpilot.followup.model.FollowUpEmail;
 import com.example.jobpilot.followup.repository.FollowUpEmailRepository;
 import com.example.jobpilot.job.model.Job;
@@ -23,9 +25,11 @@ public class FollowUpEmailService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final OpenAiService openAiService;
+        private final FollowUpEmailMapper followUpEmailMapper;
 
-    // Create and generate a new follow-up email for a job
-    public FollowUpEmail generateFollowUpEmail(UUID jobId, Long userId) {
+
+    // ✅ Create and return DTO instead of entity
+    public FollowUpEmailDTO generateFollowUpEmail(UUID jobId, UUID userId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
 
@@ -44,31 +48,38 @@ public class FollowUpEmailService {
 
         FollowUpEmail saved = followUpEmailRepository.save(email);
         job.setFollowUpEmail(saved);
-        jobRepository.save(job); // optional, since cascade persists follow-up
+        jobRepository.save(job); // Optional if cascade is set
 
-        return saved;
+        return followUpEmailMapper.toDTO(saved);
     }
 
-    // Get follow-up email by ID (with user check)
-    public FollowUpEmail getById(Long followUpId, Long userId) {
-        return followUpEmailRepository.findByIdAndJobUserId(followUpId, userId)
+    public FollowUpEmailDTO getById(UUID followUpId, UUID userId) {
+        FollowUpEmail email = followUpEmailRepository.findByIdAndUserId(followUpId, userId)
                 .orElseThrow(() -> new RuntimeException("Follow-up not found or unauthorized"));
+        return followUpEmailMapper.toDTO(email);
     }
 
-    // Get all follow-up emails for current user
-    public List<FollowUpEmail> getAllForUser(Long userId) {
-        return followUpEmailRepository.findAllByJobUserId(userId);
+    public List<FollowUpEmailDTO> getAllForUser(UUID userId) {
+        return followUpEmailRepository.findAllByUserId(userId).stream()
+                .map(followUpEmailMapper::toDTO)
+                .toList();
     }
 
-    // Improve/update follow-up email based on user instructions
-    public FollowUpEmail improveFollowUpEmail(Long followUpId, Long userId, String instructions) {
-        FollowUpEmail email = getById(followUpId, userId);
+    public FollowUpEmailDTO improveFollowUpEmail(UUID followUpId, UUID userId, String instructions) {
+        FollowUpEmail email = followUpEmailRepository.findByIdAndUserId(followUpId, userId)
+                .orElseThrow(() -> new RuntimeException("Follow-up not found or unauthorized"));
+
+        if (instructions == null || instructions.trim().isEmpty()) {
+            throw new IllegalArgumentException("Improvement instructions cannot be empty");
+        }
 
         String prompt = buildImprovementPrompt(email, instructions);
         String improvedBody = openAiService.getRawResponse(prompt);
 
         email.setBody(improvedBody);
-        return followUpEmailRepository.save(email);
+        FollowUpEmail updated = followUpEmailRepository.save(email);
+
+        return followUpEmailMapper.toDTO(updated);
     }
 
     // 🔧 Prompt builder helpers

@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class FollowUpEmail {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID id;
 
     private String subject;
@@ -40,5 +40,4 @@ public class FollowUpEmail {
     @JoinColumn(name = "job_id", nullable = false, unique = true)
     private Job job;
 
-    // Getters & Setters
 }

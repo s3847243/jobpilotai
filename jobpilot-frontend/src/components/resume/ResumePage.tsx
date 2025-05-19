@@ -71,7 +71,7 @@ const handleReplace = async () => {
       /> */}
       return (
         <div className="max-w-6xl mx-auto p-6 flex flex-col gap-8">
-          <ResumeOverviewCard resume={job.resume} />
+          <ResumeOverviewCard resumeId={job.resumeId || ''} />
           <ResumeFeedbackSection
             feedback={job.matchFeedback || ""}
             onImprove={handleImprove}

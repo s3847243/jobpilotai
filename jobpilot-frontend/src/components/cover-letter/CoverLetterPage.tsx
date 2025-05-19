@@ -27,7 +27,7 @@ const CoverLetterPage = () => {
         setJob(currentJob);
 
         // Only fetch cover letter if job has one
-        if (currentJob.coverLetter) {
+        if (currentJob.coverLetterId) {
           const { coverLetterText } = await getCoverLetterByJobId(jobId);
           setCoverLetter(coverLetterText);
         } else {
@@ -42,14 +42,14 @@ const CoverLetterPage = () => {
     loadCoverLetter();
   }, [jobId]);
   const handleGenerate = async () => {
-    if (!job || !job.resume?.id) {
+    if (!job || !job.resumeId) {
       alert("No resume found for this job.");
       return;
     }
 
     setLoading(true);
     try {
-      const data = await generateCoverLetter(job.id, job.resume.id);
+      const data = await generateCoverLetter(job.id, job.resumeId);
       console.log(data);
 
       setCoverLetter(data.coverLetterText);

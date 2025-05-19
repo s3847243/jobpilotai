@@ -7,6 +7,8 @@ import JobApp from './components/job-applications/JobApp';
 import Home from './pages/Home';
 import Login from './pages/Login'
 import CoverLetter from './components/cover-letter/CoverLetter'
+import FollowUpEmailPage from './components/followup/FollowUpEmailPage';
+import FollowUpAll from './components/followup/FollowUpAll'
 function App() {
   return (
     <BrowserRouter>
@@ -17,8 +19,10 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
           <Route path="job-hub" element={<JobApp />} />
-          <Route path="resumes" element={<ResumeApp />} />   // my resumes still needs to be implemented
+          <Route path="resumes" element={<ResumeApp />} />   
+          <Route path="follow-ups" element={<FollowUpAll />} />
           <Route path="job/:jobId/cover-letter" element={<CoverLetterPage />} />
+          <Route path="job/:jobId/follow-up" element={<FollowUpEmailPage />} />
           <Route path="job/:jobId/resume" element={<ResumePage />} />
           <Route path="cover-letters" element={<CoverLetter />} /> 
           {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}

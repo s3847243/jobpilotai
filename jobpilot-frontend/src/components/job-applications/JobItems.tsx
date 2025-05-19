@@ -80,6 +80,14 @@ const JobItems:React.FC<Props> = ({ job }) => {
             Open Cover Letter
           </Link>
         </td>
+                <td className="px-6 py-4">
+          <Link 
+            to={`/dashboard/job/${job.id}/follow-up`}
+            className="text-indigo-600 hover:underline"
+          >
+            Follow Up Email
+          </Link>
+        </td>
 
         <td className="px-6 py-4">
           <button className="text-red-500 hover:text-red-700 font-semibold">Delete</button>

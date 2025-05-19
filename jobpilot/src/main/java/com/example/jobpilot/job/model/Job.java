@@ -57,7 +57,7 @@ public class Job {
 
     @ManyToOne
     @JoinColumn(name = "resume_id", nullable = true)
-    @JsonManagedReference // serialize here not in resume 
+    @JsonManagedReference 
     private Resume resume;
     @ElementCollection
     private List<String> requiredSkills;
@@ -74,9 +74,8 @@ public class Job {
     private String matchFeedback;   
     @ElementCollection
     private List<String> missingSkills;
-    // @Column(length = 5000, columnDefinition = "TEXT") // adjust as needed
-    // private String coverLetter;
-    @JsonManagedReference // serialize here not in resume 
+ 
+    @JsonManagedReference 
     @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private CoverLetter coverLetter;
     

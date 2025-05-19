@@ -23,8 +23,10 @@ import com.example.jobpilot.user.repository.UserRepository;
 import com.example.jobpilot.ai.service.OpenAiService;
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.job.dto.CoverLetterResponse;
+import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
+import com.example.jobpilot.job.mapper.JobMapper;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.job.service.JobService;
@@ -46,7 +48,7 @@ public class JobController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final ResumeService resumeService;
-
+    private final JobMapper jobMapper;
 
     private String extractTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() != null) {
@@ -67,7 +69,7 @@ public class JobController {
     }
 
     @PostMapping("/from-url")
-    public ResponseEntity<Job> addFromUrl(
+    public ResponseEntity<JobDTO> addFromUrl(
         @RequestParam String url,
         @RequestParam(required = false) UUID resumeId,
         HttpServletRequest request
@@ -79,59 +81,58 @@ public class JobController {
             resume = resumeService.getResumeByIdForUser(resumeId, user);
         }
 
-        Job job = jobService.addJobFromUrl(url, user, resume);
+        JobDTO job = jobService.addJobFromUrl(url, user, resume);
         return ResponseEntity.ok(job);
     }
 
     @GetMapping("/{jobId}/match")
-    public ResponseEntity<Job> matchJob(@PathVariable UUID jobId, HttpServletRequest request) {
+    public ResponseEntity<JobDTO> matchJob(@PathVariable UUID jobId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-    
-        Job job = jobService.getJobById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
-    
-        if (!job.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized to match this job");
-        }
-    
+
+        Job job = jobService.getJobEntityById(jobId, user); // New method returning Job
         Resume resume = job.getResume();
+
         if (resume == null) {
             throw new RuntimeException("This job has no resume assigned");
         }
-    
-        Job updated = jobService.matchJobWithResume(job, resume);
+
+        JobDTO updated = jobService.matchJobWithResume(job, resume);
         return ResponseEntity.ok(updated);
     }
     
 
     @GetMapping
-    public ResponseEntity<List<Job>> listJobs(HttpServletRequest request) {
+    public ResponseEntity<List<JobDTO>> listJobs(HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        return ResponseEntity.ok(jobService.getUserJobs(user));
+        List<JobDTO> jobDTOs = jobService.getUserJobs(user).stream()
+                .toList();
+        return ResponseEntity.ok(jobDTOs);
     }
     @GetMapping("/{jobId}")
-    public ResponseEntity< Optional<Job>> getJobById(
+    public ResponseEntity<JobDTO> getJobById(
             @PathVariable UUID jobId,
             HttpServletRequest httpRequest
     ) {
         User user = getUserFromRequest(httpRequest);
-        Optional<Job> job = jobService.getJobById(jobId);
+        JobDTO job = jobService.getJobById(jobId,user);
+
         return ResponseEntity.ok(job);
     }
+
     @PatchMapping("/{jobId}/status")
-    public ResponseEntity<Job> updateStatus(
+    public ResponseEntity<JobDTO> updateStatus(
             @PathVariable UUID jobId,
             @RequestBody UpdateJobStatusRequest request,
             HttpServletRequest httpRequest
     ) {
         User user = getUserFromRequest(httpRequest);
-        Job updatedJob = jobService.updateJobStatus(jobId, request.getStatus().toString(), user);
+        JobDTO updatedJob = jobService.updateJobStatus(jobId, request.getStatus().toString(), user);
         return ResponseEntity.ok(updatedJob);
     }
     @PostMapping("/manual")
-    public ResponseEntity<Job> addManualJob(@RequestBody ManualJobRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<JobDTO> addManualJob(@RequestBody ManualJobRequest request, HttpServletRequest httpRequest) {
         User user = getUserFromRequest(httpRequest);
-        Job job = jobService.addManualJob(request, user);
+        JobDTO job = jobService.addManualJob(request, user);
         return ResponseEntity.ok(job);
     }
     // @CrossOrigin(
@@ -185,25 +186,25 @@ public class JobController {
     // }
 
     @PutMapping("/{jobId}/resume")
-    public ResponseEntity<Job> replaceResumeForJob(
+    public ResponseEntity<JobDTO> replaceResumeForJob(
         @PathVariable UUID jobId,
         @RequestParam("file") MultipartFile file,
         HttpServletRequest request
     ) throws IOException {
         User user = getUserFromRequest(request);
         Resume newResume = resumeService.uploadResume(file, user);
-        Job updatedJob = jobService.replaceResume(jobId, newResume, user);
+        JobDTO updatedJob = jobService.replaceResume(jobId, newResume, user);
         return ResponseEntity.ok(updatedJob);
     }
     @PutMapping("/job/{jobId}/resume")
-    public ResponseEntity<Job> assignResumeToJob(
+    public ResponseEntity<JobDTO> assignResumeToJob(
             @PathVariable UUID jobId,
             @RequestParam UUID resumeId,
             HttpServletRequest request
     ) {
         User user = getUserFromRequest(request);
         Resume resume = resumeService.getResumeByIdForUser(resumeId, user);
-        Job job = jobService.assignResume(jobId, resume, user);
+        JobDTO job = jobService.assignResume(jobId, resume, user);
         return ResponseEntity.ok(job);
     }
     // @GetMapping("/cover-letters")

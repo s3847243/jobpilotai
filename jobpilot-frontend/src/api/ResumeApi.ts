@@ -7,3 +7,8 @@ export const fetchResumes = async (): Promise<Resume[]> => {
   console.log(res.data);
   return res.data;
 };
+
+export const getResumeById = async (resumeId: string): Promise<Resume> => {
+  const response = await axiosInstance.get<Resume>(`/resume/${resumeId}`);
+  return response.data;
+};
