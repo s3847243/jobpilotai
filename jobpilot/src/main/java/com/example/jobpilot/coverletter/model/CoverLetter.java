@@ -2,12 +2,9 @@ package com.example.jobpilot.coverletter.model;
 
 import java.time.Instant;
 import java.util.UUID;
-
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,6 +45,6 @@ public class CoverLetter {
     private Instant updatedAt;
 
 
-    private boolean isFinalVersion; // optional
+    private boolean isFinalVersion; 
 
 }

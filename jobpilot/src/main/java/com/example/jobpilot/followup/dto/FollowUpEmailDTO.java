@@ -20,5 +20,4 @@ public class FollowUpEmailDTO {
     private Instant createdAt;
     private UUID jobId; // Reference only, not the full Job
 
-    // Getters & Setters
 }

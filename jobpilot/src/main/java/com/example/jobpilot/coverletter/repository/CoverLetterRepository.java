@@ -12,16 +12,8 @@ import com.example.jobpilot.user.model.User;
 
 public interface CoverLetterRepository extends JpaRepository<CoverLetter, UUID> {
 
-    // Get all cover letters by user
     List<CoverLetter> findAllByJobUser(User user);
-
-
-    // Correct: get by job
     Optional<CoverLetter> findByJob(Job job);
-
-    // Optional: check if one exists for job
     boolean existsByJobId(UUID jobId);
-
-    // Optional: delete by job id
     void deleteByJobId(UUID jobId);
 }

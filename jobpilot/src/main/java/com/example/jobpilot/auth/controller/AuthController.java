@@ -31,21 +31,21 @@ public class AuthController {
 
    @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
-    AuthResponse authResponse = authService.login(request); // generates tokens
+    AuthResponse authResponse = authService.login(request); 
 
     // Set Access Token
     Cookie accessTokenCookie = new Cookie("accessToken", authResponse.getAccessToken());
     accessTokenCookie.setHttpOnly(true);
     accessTokenCookie.setSecure(false); // Only on HTTPS
     accessTokenCookie.setPath("/");
-    accessTokenCookie.setMaxAge(15 * 60); // 15 minutes
+    accessTokenCookie.setMaxAge(100 * 60); 
 
     // Set Refresh Token
     Cookie refreshTokenCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setSecure(false);
     refreshTokenCookie.setPath("/");
-    refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+    refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); 
     response.setHeader("Set-Cookie",
     "accessToken=" + authResponse.getAccessToken() +
     "; HttpOnly; Path=/; Max-Age=900; SameSite=Lax");
@@ -57,7 +57,7 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRes
     response.addCookie(refreshTokenCookie);
 
     return ResponseEntity.ok(Map.of(
-        "user", authResponse.getUser() // or whatever user object you return
+        "user", authResponse.getUser() 
     ));
 }
 

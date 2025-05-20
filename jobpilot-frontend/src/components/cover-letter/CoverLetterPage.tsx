@@ -28,8 +28,8 @@ const CoverLetterPage = () => {
 
         // Only fetch cover letter if job has one
         if (currentJob.coverLetterId) {
-          const { coverLetterText } = await getCoverLetterByJobId(jobId);
-          setCoverLetter(coverLetterText);
+          const { text } = await getCoverLetterById(currentJob.coverLetterId);
+          setCoverLetter(text);
         } else {
           setCoverLetter(null); // No cover letter yet
         }

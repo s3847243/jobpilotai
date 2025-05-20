@@ -2,13 +2,11 @@ package com.example.jobpilot.job.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,25 +18,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.jobpilot.user.repository.UserRepository;
-import com.example.jobpilot.ai.service.OpenAiService;
-import com.example.jobpilot.auth.service.JwtService;
-import com.example.jobpilot.job.dto.CoverLetterResponse;
 import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
-import com.example.jobpilot.job.mapper.JobMapper;
 import com.example.jobpilot.job.model.Job;
-import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.job.service.JobService;
 import com.example.jobpilot.resume.model.Resume;
-import com.example.jobpilot.resume.repository.ResumeRepository;
 import com.example.jobpilot.resume.service.ResumeService;
-import com.example.jobpilot.user.model.User;
 import com.example.jobpilot.user.model.UserPrincipal;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController

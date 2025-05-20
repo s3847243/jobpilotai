@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.followup.dto.FollowUpEmailDTO;
 import com.example.jobpilot.followup.dto.ImproveEmailRequest;
-import com.example.jobpilot.followup.mappers.FollowUpEmailMapper;
-import com.example.jobpilot.followup.model.FollowUpEmail;
+
 import com.example.jobpilot.followup.service.FollowUpEmailService;
 import com.example.jobpilot.user.model.User;
 import com.example.jobpilot.user.repository.UserRepository;

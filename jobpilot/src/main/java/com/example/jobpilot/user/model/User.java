@@ -18,8 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
@@ -36,7 +34,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    private String password; // bcrypt encoded
+    private String password; 
 
     private String fullName;
     private String jobTitle;

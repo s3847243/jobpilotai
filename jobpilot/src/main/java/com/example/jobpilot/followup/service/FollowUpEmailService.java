@@ -23,12 +23,9 @@ public class FollowUpEmailService {
 
     private final FollowUpEmailRepository followUpEmailRepository;
     private final JobRepository jobRepository;
-    private final UserRepository userRepository;
     private final OpenAiService openAiService;
-        private final FollowUpEmailMapper followUpEmailMapper;
+    private final FollowUpEmailMapper followUpEmailMapper;
 
-
-    // ✅ Create and return DTO instead of entity
     public FollowUpEmailDTO generateFollowUpEmail(UUID jobId, UUID userId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));

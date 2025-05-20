@@ -7,8 +7,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.ai.service.OpenAiService;
+import com.example.jobpilot.coverletter.dto.CoverLetterDTO;
 import com.example.jobpilot.coverletter.dto.CoverLetterRequest;
 import com.example.jobpilot.coverletter.dto.CoverLetterResponse;
+import com.example.jobpilot.coverletter.mapper.CoverLetterMapper;
 import com.example.jobpilot.coverletter.model.CoverLetter;
 import com.example.jobpilot.coverletter.repository.CoverLetterRepository;
 import com.example.jobpilot.job.model.Job;
@@ -28,33 +30,35 @@ public class CoverLetterService {
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
     private final CoverLetterRepository coverLetterRepository;
+    private final CoverLetterMapper coverLetterMapper;
+    @Transactional
+    public CoverLetterResponse generateCoverLetter(CoverLetterRequest request,User user) {
+    Resume resume = resumeRepository.findById(request.getResumeId())
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-@Transactional
-public CoverLetterResponse generateCoverLetter(CoverLetterRequest request,User user) {
-Resume resume = resumeRepository.findById(request.getResumeId())
-            .orElseThrow(() -> new RuntimeException("Resume not found"));
+        Job job = jobRepository.findById(request.getJobId())
+                .orElseThrow(() -> new RuntimeException("Job not found"));
 
-    Job job = jobRepository.findById(request.getJobId())
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+        String coverLetterText = openAiService.generateCoverLetter(
+                resume.getParsedSummary(),
+                job.getTitle(),
+                job.getCompany(),
+                job.getDescription()
+        );
 
-    String coverLetterText = openAiService.generateCoverLetter(
-            resume.getParsedSummary(),
-            job.getTitle(),
-            job.getCompany(),
-            job.getDescription()
-    );
+        CoverLetter coverLetter = new CoverLetter();
+        coverLetter.setUser(user); 
+        coverLetter.setJob(job);
+        coverLetter.setContent(coverLetterText);
+        coverLetter.setCreatedAt(Instant.now());
+        coverLetterRepository.save(coverLetter);
 
-    CoverLetter coverLetter = new CoverLetter();
-    coverLetter.setUser(user); // ✅ This was missing
-    coverLetter.setJob(job);
-    coverLetter.setContent(coverLetterText);
-    coverLetter.setCreatedAt(Instant.now());
-    coverLetterRepository.save(coverLetter);
-
-    return new CoverLetterResponse(coverLetterText);
-}
-    public List<CoverLetter> getAllCoverLettersByUser(User user) {
-        return coverLetterRepository.findAllByJobUser(user);
+        return new CoverLetterResponse(coverLetterText);
+    }
+    public List<CoverLetterDTO> getAllCoverLettersByUser(User user) {
+        return coverLetterRepository.findAllByJobUser(user).stream()
+                .map(coverLetterMapper::toDTO)
+                .toList();
     }
 
     public CoverLetterResponse getCoverLetter(UUID jobId, User user) {
@@ -72,7 +76,7 @@ Resume resume = resumeRepository.findById(request.getResumeId())
     }
 
     @Transactional
-    public CoverLetter updateCoverLetter(UUID jobId, String newContent, User user) {
+    public CoverLetterDTO updateCoverLetter(UUID jobId, String newContent, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
         if (!job.getUser().getUserId().equals(user.getUserId())) {
@@ -84,7 +88,8 @@ Resume resume = resumeRepository.findById(request.getResumeId())
 
         coverLetter.setContent(newContent);
         coverLetter.setCreatedAt(Instant.now());
-        return coverLetterRepository.save(coverLetter);
+        CoverLetter saved = coverLetterRepository.save(coverLetter);
+        return coverLetterMapper.toDTO(saved);
     }
 
     public String improveCoverLetter(UUID jobId, String instruction, User user) {
@@ -103,27 +108,15 @@ Resume resume = resumeRepository.findById(request.getResumeId())
         coverLetterRepository.save(letter);
         return improved;
     }
-    public CoverLetter getCoverLetterByIdForUser(UUID coverLetterId, User user) {
+    public CoverLetterDTO getCoverLetterByIdForUser(UUID coverLetterId, User user) {
     CoverLetter coverLetter = coverLetterRepository.findById(coverLetterId)
         .orElseThrow(() -> new RuntimeException("Cover letter not found"));
 
-    // Ensure it belongs to the requesting user via the job
     if (!coverLetter.getJob().getUser().getUserId().equals(user.getUserId())) {
         throw new RuntimeException("Unauthorized access to this cover letter");
     }
 
-    return coverLetter;
+    return coverLetterMapper.toDTO(coverLetter);
     }
-    
-    public CoverLetter getCoverLetterByJobId(UUID jobId, User user) {
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        if (!job.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized access to job cover letter");
-        }
-
-        return coverLetterRepository.findByJob(job)
-                .orElseThrow(() -> new RuntimeException("Cover letter not found for this job"));
-    }
 }
