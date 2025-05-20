@@ -50,6 +50,7 @@ public class S3Service {
 
         return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
     }
+    
     public void deleteFile(String fileKey) {
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)

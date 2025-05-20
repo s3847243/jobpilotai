@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +21,7 @@ import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.model.JobStatus;
 import com.example.jobpilot.job.repository.JobRepository;
 import com.example.jobpilot.resume.model.Resume;
+import com.example.jobpilot.resume.repository.ResumeRepository;
 import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,10 +35,10 @@ public class JobService {
     private final JobRepository jobRepository;
     private final OpenAiService openAiService;
     private final ResumeService resumeService;
+    private final ResumeRepository resumeRepository;
     private final JobMapper jobMapper;
-    public JobDTO  addJobFromUrl(String url, User user, Resume resume) {
+    public JobDTO  addJobFromUrl(String url, User user, UUID resumeId) {
         try {
-            // Step 1: Fetch job page
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla")
                     .timeout(10_000)
@@ -46,14 +46,14 @@ public class JobService {
 
             String pageText = doc.body().text();
 
-            // Step 2: Ask OpenAI to extract job info
             String aiJson = openAiService.extractJobInfoFromText(pageText);
 
-            // Step 3: Convert JSON to Java object
             ObjectMapper mapper = new ObjectMapper();
             JobDetailsDTO parsed = mapper.readValue(aiJson, JobDetailsDTO.class);
-
-            // Step 4: Save to DB
+            Resume resume = null;
+            if (resumeId != null) {
+                resume = resumeService.getResumeEntityByIdForUser(resumeId);
+            }
             Job job = Job.builder()
                     .user(user)
                     .resume(resume)
@@ -186,7 +186,7 @@ public class JobService {
         }
         // Delete the old resume file and DB entry
         Resume oldResume = job.getResume();
-        resumeService.deleteFile(oldResume);
+        resumeService.deleteResume(oldResume.getId(),user);
         job.setResume(newResume);
             // Invalidate old cover letter
         job.setCoverLetter(null);
@@ -195,10 +195,11 @@ public class JobService {
         job.setMissingSkills(null);
         return jobMapper.toDTO(jobRepository.save(job));
     }
-    public JobDTO  assignResume(UUID jobId, Resume resume, User user) {
+    public JobDTO  assignResume(UUID jobId, UUID resumeId, User user) {
         Job job = jobRepository.findById(jobId)
             .orElseThrow(() -> new RuntimeException("Job not found"));
-
+        Resume resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new RuntimeException("Resume  not found"));
         if (!job.getUser().getUserId().equals(user.getUserId())) {
             throw new RuntimeException("Unauthorized");
         }

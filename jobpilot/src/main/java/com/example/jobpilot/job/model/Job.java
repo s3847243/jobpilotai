@@ -57,7 +57,6 @@ public class Job {
 
     @ManyToOne
     @JoinColumn(name = "resume_id", nullable = true)
-    @JsonManagedReference 
     private Resume resume;
     @ElementCollection
     private List<String> requiredSkills;

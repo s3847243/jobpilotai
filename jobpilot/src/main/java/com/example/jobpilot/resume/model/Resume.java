@@ -43,7 +43,7 @@ public class Resume {
     private String parsedSummary;
 
     private Instant uploadedAt;
+    
     @OneToMany(mappedBy = "resume")
-    @JsonBackReference
     private List<Job> jobs;
 }

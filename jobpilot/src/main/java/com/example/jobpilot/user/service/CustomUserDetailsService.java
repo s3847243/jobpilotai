@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.user.model.User;
+import com.example.jobpilot.user.model.UserPrincipal;
 import com.example.jobpilot.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private final UserRepository userRepository;
 
+    // @Override
+    // public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    //     User user = userRepository.findByEmail(email)
+    //         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    //     return org.springframework.security.core.userdetails.User.builder()
+    //         .username(user.getEmail())
+    //         .password(user.getPassword())
+    //         .roles(user.getRole().name())
+    //         .build();
+    // }
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return org.springframework.security.core.userdetails.User.builder()
-            .username(user.getEmail())
-            .password(user.getPassword())
-            .roles(user.getRole().name())
-            .build();
+        return new UserPrincipal(user);
     }
 }
