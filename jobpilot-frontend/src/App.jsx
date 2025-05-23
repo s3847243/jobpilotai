@@ -9,6 +9,7 @@ import Login from './pages/Login'
 import CoverLetter from './components/cover-letter/CoverLetter'
 import FollowUpEmailPage from './components/followup/FollowUpEmailPage';
 import FollowUpAll from './components/followup/FollowUpAll'
+import ResumeDetails from './components/resume/ResumeDetails';
 function App() {
   return (
     <BrowserRouter>
@@ -24,7 +25,8 @@ function App() {
           <Route path="job/:jobId/cover-letter" element={<CoverLetterPage />} />
           <Route path="job/:jobId/follow-up" element={<FollowUpEmailPage />} />
           <Route path="job/:jobId/resume" element={<ResumePage />} />
-          <Route path="cover-letters" element={<CoverLetter />} /> 
+          <Route path="cover-letters" element={<CoverLetter />} />
+          <Route path="resumes/:resumeId" element={<ResumeDetails />} /> 
           {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}
 
           {/* Jobs */}

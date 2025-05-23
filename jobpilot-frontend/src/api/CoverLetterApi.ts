@@ -10,7 +10,7 @@ export interface CoverLetterRequest {
 
 export interface CoverLetterResponse {
   id: string;
-  text: string;
+  content: string;
   jobId: string;
   createdAt: string;
 }
@@ -40,6 +40,7 @@ export const improveCoverLetter = async (
 
 export const getCoverLetterById = async (coverLetterId: string): Promise<CoverLetterResponse> => {
   const res = await axiosInstance.get(`/cover-letters/${coverLetterId}`, { withCredentials: true });
+  console.log(res.data);
   return res.data;
 };
 

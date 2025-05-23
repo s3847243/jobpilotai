@@ -1,8 +1,7 @@
-import React from 'react';
 import { Edit3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const FollowUpItem = ({ id, name, date }: { id: string; name: string; date: string }) => {
+const FollowUpItem = ({ id, name, jobId,date }: { id: string; name: string; jobId:string;date: string }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md flex flex-col gap-4 w-full max-w-sm">
       <div className="flex items-start justify-between">
@@ -17,7 +16,7 @@ const FollowUpItem = ({ id, name, date }: { id: string; name: string; date: stri
       </div>
 
       <Link
-        to={`/dashboard/resumes/raw/${id}`}
+        to={`/dashboard/job/${jobId}/follow-up`}
         className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full w-full"
       >
         <Edit3 size={18} />

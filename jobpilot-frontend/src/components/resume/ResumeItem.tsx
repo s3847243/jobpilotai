@@ -17,7 +17,7 @@ const ResumeItem = ({ id, name, date }: { id: string; name: string; date: string
       </div>
 
       <Link
-        to={`/dashboard/resumes/raw/${id}`}
+        to={`/dashboard/resumes/${id}`}
         className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full w-full"
       >
         <Edit3 size={18} />

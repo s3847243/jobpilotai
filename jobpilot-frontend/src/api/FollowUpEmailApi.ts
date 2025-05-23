@@ -21,10 +21,12 @@ export const improveFollowUpEmail = async (
   const res = await axiosInstance.put(`/follow-up/${followUpId}/improve`, {
     instructions,
   });
+  console.log(res);
   return res.data;
 };
 
 export const getAllFollowUpsForUser = async (): Promise<FollowUpEmail[]> => {
   const response = await axiosInstance.get<FollowUpEmail[]>('/follow-up/all');
+  console.log(response.data);
   return response.data;
 };

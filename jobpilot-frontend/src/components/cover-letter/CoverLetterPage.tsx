@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { generateCoverLetter,improveCoverLetter,getCoverLetterById, getCoverLetterByJobId } from '../../api/CoverLetterApi';
+import { generateCoverLetter,improveCoverLetter,getCoverLetterById } from '../../api/CoverLetterApi';
 import { getJobById, Job } from '../../api/JobApi';
+interface ChatMessage {
+  id: number;
+  text: string;
+  animate: boolean;
+}
 const CoverLetterPage = () => {
   const {jobId} = useParams<{ jobId: string }>();
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const[job, setJob] = useState<Job>();
-  // useEffect(() => {
-  //   const loadCoverLetter = async () => {
-  //     if (!jobId) return;
-  //     const currentJob = await getJobById(jobId);
-  //     setJob(currentJob);
-  //     const { coverLetter } = await getCoverLetterByJobId(jobId);
-  //     setCoverLetter(coverLetter); 
-  //   };
-  //   loadCoverLetter();
-  // }, [jobId]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [nextId, setNextId] = useState(0);
+
   useEffect(() => {
     const loadCoverLetter = async () => {
       if (!jobId) return;
@@ -26,12 +24,11 @@ const CoverLetterPage = () => {
         const currentJob = await getJobById(jobId);
         setJob(currentJob);
 
-        // Only fetch cover letter if job has one
         if (currentJob.coverLetterId) {
-          const { text } = await getCoverLetterById(currentJob.coverLetterId);
-          setCoverLetter(text);
+          const { content } = await getCoverLetterById(currentJob.coverLetterId);
+          setCoverLetter(content);
         } else {
-          setCoverLetter(null); // No cover letter yet
+          setCoverLetter(null); 
         }
 
       } catch (error) {
@@ -61,10 +58,24 @@ const CoverLetterPage = () => {
   const handleImprove = async () => {
     if (!input.trim()) return;
     setLoading(true);
+    // Save message in local chat history
+    const id = nextId;
+    setNextId(prev => prev + 1);
+
+    // Add message with animation disabled
+    setMessages(prev => [...prev, { id, text: input, animate: false }]);
+
+    // Activate animation in next tick
+    setTimeout(() => {
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === id ? { ...msg, animate: true } : msg
+        )
+      );
+    }, 10); // minimal delay to trigger transition
     const updated = await improveCoverLetter(jobId!, input);
-    setCoverLetter(updated);
-    // await updateCoverLetter(jobId!, updated); // persist
     setInput('');
+    setCoverLetter(updated);
     setLoading(false);
   };
   return (
@@ -73,13 +84,27 @@ const CoverLetterPage = () => {
       {/* Left: AI Chat Assistant */}
       <div className="w-1/2 p-6 border-r border-gray-200 flex flex-col gap-4 overflow-y-auto">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">💬 Smart Assistant</h2>
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
-            Hello! I’ve analyzed your cover letter. Let's improve it together.
-          </p>
-          <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
-            ✍️ Suggestion: Add more quantifiable impact — e.g., “improved response time by 35%”.
-          </p>
+        <div className="flex flex-col gap-3 overflow-y-auto">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`
+                transform transition-all duration-300 ease-out
+                ${msg.animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                bg-white p-3 rounded-md shadow-sm text-sm text-gray-600
+              `}
+            >
+              🧠 You: {msg.text}
+            </div>
+          ))}
+
+          {messages.length === 0 && (
+            <>
+              <p className="text-sm text-gray-600 bg-white p-3 rounded-md shadow-sm">
+                ✍️ Suggestion: Add more quantifiable impact — e.g., “improved response time by 35%”.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="mt-auto flex gap-3">
@@ -128,7 +153,7 @@ const CoverLetterPage = () => {
               ✍️ Generate Cover Letter
             </button>
           </div>
-)}
+      )}
       </div>
     </div>
   );

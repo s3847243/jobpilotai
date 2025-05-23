@@ -32,6 +32,7 @@ const CoverLetter = () => {
           <CoverLetterItem
             key={cl.id}
             id={cl.id}
+            jobId = {cl.jobId}
             title={"just rnadom"}
             company={"cl.job.company"}
             date={cl.createdAt}

@@ -6,7 +6,7 @@ export type Resume = {
 //   parsedName: string;
 //   parsedEmail: string;
 //   parsedPhone: string;
-//   parsedSkills: string[];
+parsedSkills: string[];
 //   parsedSummary: string;
 uploadedAt: string;
 };

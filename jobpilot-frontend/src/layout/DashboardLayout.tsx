@@ -10,7 +10,7 @@ import { PersonStanding } from 'lucide-react'
 import { Moon } from 'lucide-react'
 const DashboardLayout = () => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar>
             <SidebarItem icon={<BarChart3 size={20}  />} text="Job Applications" to="/dashboard/job-hub"  />
             <SidebarItem icon={<File size={20}  />} text="Resumes" to="/dashboard/resumes" />
@@ -21,7 +21,7 @@ const DashboardLayout = () => {
             <SidebarItem icon={<Moon size={20}  />} text="Theme" to="/dashboard/job-hub" />
 
         </Sidebar>
-      <div className="flex-1 bg-gray-50 p-6">
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
         <Outlet />
       </div>
     </div>

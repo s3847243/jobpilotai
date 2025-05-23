@@ -36,6 +36,7 @@ const FollowUpAll = () => {
             key={email.id}
             id={email.id}
             name={email.jobId}
+            jobId = {email.jobId}
             date={new Date(email.createdAt).toLocaleDateString()}
           />
         ))}

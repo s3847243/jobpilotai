@@ -2,9 +2,10 @@
 import { Edit3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const CoverLetterItem = ({ id, title, company, date }: {
+const CoverLetterItem = ({ id, title, jobId,company, date }: {
   id: string;
   title: string;
+  jobId:string;
   company: string;
   date: string;
 }) => {
@@ -20,7 +21,7 @@ const CoverLetterItem = ({ id, title, company, date }: {
       </span>
 
       <Link
-        to={`/dashboard/job/${id}/cover-letter`}
+        to={`/dashboard/job/${jobId}/cover-letter`}
         className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full w-full"
       >
         <Edit3 size={18} />

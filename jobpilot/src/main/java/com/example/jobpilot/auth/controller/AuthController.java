@@ -38,7 +38,7 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRes
     accessTokenCookie.setHttpOnly(true);
     accessTokenCookie.setSecure(false); // Only on HTTPS
     accessTokenCookie.setPath("/");
-    accessTokenCookie.setMaxAge(100 * 60); 
+    accessTokenCookie.setMaxAge(15 * 60); 
 
     // Set Refresh Token
     Cookie refreshTokenCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
