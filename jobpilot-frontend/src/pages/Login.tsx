@@ -17,7 +17,6 @@ function Login() {
     try {
       const data = await login(email, password);
       console.log(data);
-      localStorage.setItem("token", data.accessToken); // or use setAuthToken()
       navigate("/dashboard"); // redirect after login
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");

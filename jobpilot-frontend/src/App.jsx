@@ -10,12 +10,14 @@ import CoverLetter from './components/cover-letter/CoverLetter'
 import FollowUpEmailPage from './components/followup/FollowUpEmailPage';
 import FollowUpAll from './components/followup/FollowUpAll'
 import ResumeDetails from './components/resume/ResumeDetails';
+import Register from './pages/Register'
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
 
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
@@ -27,6 +29,7 @@ function App() {
           <Route path="job/:jobId/resume" element={<ResumePage />} />
           <Route path="cover-letters" element={<CoverLetter />} />
           <Route path="resumes/:resumeId" element={<ResumeDetails />} /> 
+
           {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}
 
           {/* Jobs */}

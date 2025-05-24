@@ -32,6 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = extractToken(request);
+        System.out.println("token: "+token);
         if (token != null) {
             String email = jwtService.extractEmail(token);
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -65,7 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             System.out.println("🔐 Token from Authorization header");
             return header.substring(7);
         }
-
+        System.out.println("requesttt"+request);
         // 2. Then try HttpOnly Cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {

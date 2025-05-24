@@ -48,6 +48,8 @@ public class ResumeController {
 
     @GetMapping
     public ResponseEntity<List<ResumeDTO>> getAllResumes(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        System.out.println("User = " + userPrincipal.getUser()); // Check if it's null
+
         List<ResumeDTO> resumes = resumeService.getResumesByUser(userPrincipal.getUser());
         return ResponseEntity.ok(resumes);
     }

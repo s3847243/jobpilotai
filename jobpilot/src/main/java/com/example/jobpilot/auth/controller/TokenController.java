@@ -1,6 +1,12 @@
 package com.example.jobpilot.auth.controller;
 
+import java.time.Duration;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,8 +34,11 @@ public class TokenController {
     private final UserRepository userRepository;
 
 @PostMapping("/refresh")
-public ResponseEntity<AuthResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
-    String requestRefreshToken = request.getRefreshToken();
+public ResponseEntity<AuthResponse> refreshToken(@CookieValue(value = "refreshToken", required = false) String requestRefreshToken) {
+    System.out.println("somethign happens here");
+    if (requestRefreshToken == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
     RefreshToken token = refreshTokenService.findByToken(requestRefreshToken)
             .map(refreshTokenService::verifyExpiration)
@@ -38,11 +47,22 @@ public ResponseEntity<AuthResponse> refreshToken(@RequestBody TokenRefreshReques
     User user = token.getUser();
     String newAccessToken = jwtService.generateToken(user);
 
-    return ResponseEntity.ok(AuthResponse.builder()
-            .accessToken(newAccessToken)
-            .refreshToken(requestRefreshToken)
-            .user(UserDTO.from(user))
-            .build());
+    // Optionally, refresh token can be rotated and re-set here
+
+    ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", newAccessToken)
+            .httpOnly(true)
+            .secure(true) // ✅ required in production
+            .path("/")
+            .sameSite("Lax") // or "None" if cross-site
+            .maxAge(Duration.ofMinutes(15))
+            .build();
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+            .body(AuthResponse.builder()
+                    .accessToken(newAccessToken) // optional, mostly for dev
+                    .user(UserDTO.from(user))
+                    .build());
 }
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {

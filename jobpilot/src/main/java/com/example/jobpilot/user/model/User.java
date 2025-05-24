@@ -40,12 +40,6 @@ public class User {
     private String jobTitle;
     private String location;
 
-    @ElementCollection
-    private List<String> skills;
-
-    private String linkedinUrl;
-
-    private Integer resumeVersionCount = 0;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
