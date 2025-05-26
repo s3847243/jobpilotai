@@ -13,6 +13,8 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.ai.service.OpenAiService;
+import com.example.jobpilot.coverletter.model.CoverLetter;
+import com.example.jobpilot.coverletter.repository.CoverLetterRepository;
 import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.JobDetailsDTO;
 import com.example.jobpilot.job.dto.ManualJobRequest;
@@ -26,6 +28,7 @@ import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,6 +39,7 @@ public class JobService {
     private final OpenAiService openAiService;
     private final ResumeService resumeService;
     private final ResumeRepository resumeRepository;
+    private final CoverLetterRepository coverLetterRepository;
     private final JobMapper jobMapper;
     public JobDTO  addJobFromUrl(String url, User user, UUID resumeId) {
         try {
@@ -62,7 +66,6 @@ public class JobService {
                     .location(parsed.getLocation())
                     .employmentType(parsed.getEmploymentType())
                     .description(parsed.getDescription())
-                    .requiredSkills(parsed.getRequiredSkills())
                     .url(url)
                     .source("OpenAI")
                     .status(JobStatus.SAVED) 
@@ -167,7 +170,6 @@ public class JobService {
             .location(request.getLocation())
             .employmentType(request.getEmploymentType())
             .description(request.getDescription())
-            .requiredSkills(request.getRequiredSkills())
             .source("Manual")
             .status(JobStatus.SAVED) 
             .createdAt(Instant.now())
@@ -195,7 +197,10 @@ public class JobService {
         job.setMissingSkills(null);
         return jobMapper.toDTO(jobRepository.save(job));
     }
+    @Transactional
     public JobDTO  assignResume(UUID jobId, UUID resumeId, User user) {
+        System.out.println("it is getting here");
+
         Job job = jobRepository.findById(jobId)
             .orElseThrow(() -> new RuntimeException("Job not found"));
         Resume resume = resumeRepository.findById(resumeId)
@@ -205,12 +210,27 @@ public class JobService {
         }
 
         job.setResume(resume);
-        job.setCoverLetter(null); // Invalidate old cover letter
+        
         job.setMatchScore(null);
         job.setMatchFeedback(null);
         job.setMissingSkills(null);
+        // 🔥 Invalidate old cover letter
+        CoverLetter existingCoverLetter = job.getCoverLetter();
+        if (existingCoverLetter != null) {
+            String coverLetterText = openAiService.generateCoverLetter(
+                resume.getParsedSummary(),
+                job.getTitle(),
+                job.getCompany(),
+                job.getDescription()
+                );
+            existingCoverLetter.setContent(coverLetterText);
+            existingCoverLetter.setUpdatedAt(Instant.now());
+            existingCoverLetter.setFinalVersion(false);
+            coverLetterRepository.save(existingCoverLetter);
+        }
 
         return jobMapper.toDTO(jobRepository.save(job));
+
     }
     
 }

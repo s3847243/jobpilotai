@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateCoverLetter,improveCoverLetter,getCoverLetterById } from '../../api/CoverLetterApi';
 import { getJobById, Job } from '../../api/JobApi';
+import { useNavigate } from 'react-router-dom';
+import { downloadAsPdf } from '../followup/DownloadAsPdf';
 interface ChatMessage {
   id: number;
   text: string;
@@ -15,6 +17,7 @@ const CoverLetterPage = () => {
   const[job, setJob] = useState<Job>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [nextId, setNextId] = useState(0);
+const navigate = useNavigate();
 
   useEffect(() => {
     const loadCoverLetter = async () => {
@@ -79,8 +82,21 @@ const CoverLetterPage = () => {
     setLoading(false);
   };
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-50">
-      
+      <div className="max-w-10xl mx-auto p-1">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md shadow-sm transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L7 10.414a1 1 0 010-1.414L11.293 4.293a1 1 0 111.414 1.414L9.414 9l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back
+          </button>
+        </div>
+    <div className="flex h-[calc(100vh-90px)] bg-gray-50">
+        
       {/* Left: AI Chat Assistant */}
       <div className="w-1/2 p-6 border-r border-gray-200 flex flex-col gap-4 overflow-y-auto">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">💬 Smart Assistant</h2>
@@ -129,7 +145,11 @@ const CoverLetterPage = () => {
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold text-gray-800">📄 Your Cover Letter</h2>
           <button
-            onClick={() => {/* trigger download */}}
+            onClick={() => {
+              if (coverLetter) {
+                downloadAsPdf("coverLetter",coverLetter,true);
+              }
+            }}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
           >
             ⬇️ Download PDF
@@ -155,6 +175,7 @@ const CoverLetterPage = () => {
           </div>
       )}
       </div>
+    </div>
     </div>
   );
 };

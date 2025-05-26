@@ -109,15 +109,16 @@ public class JobController {
         return ResponseEntity.ok(updatedJob);
     }
 
-    @PutMapping("/job/{jobId}/resume")
+    @PutMapping("/{jobId}/assign-resume/{resumeId}")
     public ResponseEntity<JobDTO> assignResumeToJob(
             @PathVariable UUID jobId,
-            @RequestParam UUID resumeId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        
-        JobDTO job = jobService.assignResume(jobId, resumeId, userPrincipal.getUser());
-        return ResponseEntity.ok(job);
+            @PathVariable UUID resumeId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        // Resume resume = resumeService.getResumeByIdForUser(resumeId, userPrincipal.getUser());
+        JobDTO updated = jobService.assignResume(jobId, resumeId, userPrincipal.getUser());
+            
+        return ResponseEntity.ok(updated);
     }
 
 }

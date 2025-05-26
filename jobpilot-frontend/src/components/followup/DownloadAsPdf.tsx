@@ -1,12 +1,14 @@
 import { jsPDF } from 'jspdf';
 
-export const downloadAsPdf = (subject: string, body: string) => {
+export const downloadAsPdf = (subject: string, body: string, isCoverLetter:boolean) => {
   const doc = new jsPDF();
+  if(!isCoverLetter){
+      // Set subject as title
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(subject, 10, 20);
+    }
 
-  // Set subject as title
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text(subject, 10, 20);
 
   // Set body text
   doc.setFontSize(12);

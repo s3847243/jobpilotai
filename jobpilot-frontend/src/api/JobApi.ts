@@ -79,18 +79,12 @@ export const matchJobWithResume = async (jobId: string): Promise<Job> => {
   return res.data;
 };
 
-export const replaceResumeForJob = async (jobId: string, file: File) => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const res = await axiosInstance.put(`/job/${jobId}/resume`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    },
+export const assignResumeToJob = async (jobId: string, resumeId: string) => {
+  const res = await axiosInstance.put(`/job/${jobId}/assign-resume/${resumeId}`, {
     withCredentials: true
   });
   console.log(res.data);
-  return res.data; // updated Job object
+  return res.data;
 };
 
 export const updateJobStatus = async (jobId: string, status: string) => {

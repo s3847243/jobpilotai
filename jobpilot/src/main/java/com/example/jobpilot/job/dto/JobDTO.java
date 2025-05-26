@@ -23,8 +23,8 @@ public class JobDTO {
     private String url;
     private JobStatus status;
     private String matchFeedback;
-    private List<String> requiredSkills;
     private List<String> missingSkills;
+    private Double matchScore; // Calculated value
 
     private UUID userId;            // Not exposing full User entity
     private UUID resumeId;          // Just linking resume

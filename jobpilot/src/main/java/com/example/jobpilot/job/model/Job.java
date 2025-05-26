@@ -55,8 +55,7 @@ public class Job {
     @ManyToOne
     @JoinColumn(name = "resume_id", nullable = true)
     private Resume resume;
-    @ElementCollection
-    private List<String> requiredSkills;
+
 
     private String url;
     private String source; // "LinkedIn", "Seek", "Manual", etc.

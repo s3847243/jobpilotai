@@ -5,7 +5,7 @@ import {
   improveFollowUpEmail,
 } from '../../api/FollowUpEmailApi';
 import { FollowUpEmail } from '../../types/FollowUpEmail';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getJobById } from '../../api/JobApi';
 import { downloadAsPdf } from './DownloadAsPdf';
 interface ChatMessage {
@@ -21,7 +21,8 @@ const FollowUpEmailPage: React.FC = () => {
   const [improving, setImproving] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
-  
+  const navigate = useNavigate();
+
     const [nextId, setNextId] = useState(0);
   useEffect(() => {
     if (jobId) fetchFollowUp();
@@ -81,7 +82,20 @@ const fetchFollowUp = async () => {
     }
   };
     return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-50">
+     <div className="max-w-10xl mx-auto p-1">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md shadow-sm transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L7 10.414a1 1 0 010-1.414L11.293 4.293a1 1 0 111.414 1.414L9.414 9l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back
+          </button>
+        </div>
+    <div className="flex h-[calc(100vh-90px)] bg-gray-50">
       
       {/* Left: AI Chat Assistant */}
       <div className="w-1/2 p-6 border-r border-gray-200 flex flex-col gap-4 overflow-y-auto">
@@ -120,9 +134,9 @@ const fetchFollowUp = async () => {
           <button
             onClick={handleImprove}
             disabled={!email || improving}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+            className="bg-green-600 hover:bg-green-700 text-white text-md px-4 py-2 rounded-md"
           >
-            {improving ? 'Improving...' : 'Send Instructions'}
+            {improving ? 'Improving...' : 'Enter'}
           </button>
         </div>
       </div>
@@ -135,7 +149,7 @@ const fetchFollowUp = async () => {
             disabled ={!email}
             onClick={() => {
               if (email) {
-                downloadAsPdf(email.subject, email.body);
+                downloadAsPdf(email.subject, email.body,false);
               }
             }}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
@@ -164,6 +178,7 @@ const fetchFollowUp = async () => {
           </div>
       )}
       </div>
+    </div>
     </div>
   );
 };

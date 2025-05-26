@@ -17,9 +17,8 @@ public class JobMapper {
         dto.setUrl(job.getUrl());
         dto.setMatchFeedback(job.getMatchFeedback());
         dto.setStatus(job.getStatus()); 
-        dto.setRequiredSkills(job.getRequiredSkills());
         dto.setMissingSkills(job.getMissingSkills());
-
+        dto.setMatchScore(job.getMatchScore());
         dto.setUserId(job.getUser() != null ? job.getUser().getUserId() : null);
         dto.setResumeId(job.getResume() != null ? job.getResume().getId() : null);
         dto.setCoverLetterId(job.getCoverLetter() != null ? job.getCoverLetter().getId() : null);
