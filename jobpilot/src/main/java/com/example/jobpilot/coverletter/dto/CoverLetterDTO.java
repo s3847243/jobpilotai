@@ -20,4 +20,5 @@ public class CoverLetterDTO {
     private Instant updatedAt;
 
     private boolean isFinalVersion;
+    private String coverLetterName;
 }

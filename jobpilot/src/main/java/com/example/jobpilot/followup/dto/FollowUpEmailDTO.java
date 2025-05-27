@@ -19,5 +19,6 @@ public class FollowUpEmailDTO {
     private String body;
     private Instant createdAt;
     private UUID jobId; // Reference only, not the full Job
+    private String followUpEmailName;
 
 }

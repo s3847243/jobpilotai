@@ -22,10 +22,10 @@ const FollowUpAll = () => {
     <section>
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-mono px-10 py-2">My Follow Up Emails</h1>
-        <button className="flex items-center gap-2 bg-green-600 hover:bg-lime-500 text-white font-semibold py-2 px-4 rounded-full mr-10">
+        {/* <button className="flex items-center gap-2 bg-green-600 hover:bg-lime-500 text-white font-semibold py-2 px-4 rounded-full mr-10">
           <Plus size={20} />
           Follow Up Emails
-        </button>
+        </button> */}
       </div>
 
       <hr className="my-3 border-t-4 py-3" />
@@ -35,7 +35,7 @@ const FollowUpAll = () => {
           <FollowUpItem
             key={email.id}
             id={email.id}
-            name={email.jobId}
+            name={email.followUpEmailName}
             jobId = {email.jobId}
             date={new Date(email.createdAt).toLocaleDateString()}
           />

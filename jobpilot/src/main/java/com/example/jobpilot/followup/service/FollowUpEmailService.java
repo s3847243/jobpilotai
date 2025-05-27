@@ -13,8 +13,6 @@ import com.example.jobpilot.followup.model.FollowUpEmail;
 import com.example.jobpilot.followup.repository.FollowUpEmailRepository;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.repository.JobRepository;
-import com.example.jobpilot.user.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,6 +40,7 @@ public class FollowUpEmailService {
         email.setSubject("Following up on " + job.getTitle() + " at " + job.getCompany());
         email.setBody(content);
         email.setCreatedAt(Instant.now());
+        email.setFollowUpEmailName("Email at "+ job.getCompany());
 
         FollowUpEmail saved = followUpEmailRepository.save(email);
         job.setFollowUpEmail(saved);

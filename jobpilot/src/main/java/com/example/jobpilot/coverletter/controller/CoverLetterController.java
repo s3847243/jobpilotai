@@ -38,11 +38,11 @@ public class CoverLetterController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<CoverLetterResponse> generateCoverLetter(
+    public ResponseEntity<CoverLetterDTO> generateCoverLetter(
             @RequestBody CoverLetterRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        CoverLetterResponse response = coverLetterService.generateCoverLetter(request,userPrincipal.getUser());
+        CoverLetterDTO response = coverLetterService.generateCoverLetter(request,userPrincipal.getUser());
         return ResponseEntity.ok(response);
     }
 

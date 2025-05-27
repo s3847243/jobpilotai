@@ -13,12 +13,13 @@ export interface CoverLetterResponse {
   content: string;
   jobId: string;
   createdAt: string;
+  coverLetterName: string;
 }
 
 export const generateCoverLetter = async (jobId: string, resumeId: string) => {
   const res = await axiosInstance.post(
     `/cover-letters/generate`, 
-    { jobId, resumeId }, // ✅ CoverLetterRequest DTO
+    { jobId, resumeId }, 
     { withCredentials: true }
   );
   console.log(res.data);

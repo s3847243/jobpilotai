@@ -31,20 +31,17 @@ public class CoverLetter {
     @Id
     @GeneratedValue
     private UUID id;
-        @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", unique = true, nullable = false)
-    @JsonBackReference
     private Job job;
     @Column(length = 5000)
     private String content;
-
     private Instant createdAt;
     private Instant updatedAt;
-
-
     private boolean isFinalVersion; 
+    private String coverLetterName;
 
 }

@@ -38,4 +38,6 @@ public class FollowUpEmail {
     @JoinColumn(name = "job_id", nullable = false, unique = true)
     private Job job;
 
+    private String followUpEmailName;
+
 }

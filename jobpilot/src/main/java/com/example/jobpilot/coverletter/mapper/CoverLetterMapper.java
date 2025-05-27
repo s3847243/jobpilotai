@@ -16,6 +16,7 @@ public class CoverLetterMapper {
         dto.setContent(entity.getContent());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
+        dto.setCoverLetterName(entity.getCoverLetterName());
         dto.setFinalVersion(entity.isFinalVersion());
         return dto;
     }

@@ -16,6 +16,7 @@ public class FollowUpEmailMapper {
         dto.setBody(email.getBody());
         dto.setCreatedAt(email.getCreatedAt());
         dto.setJobId(email.getJob() != null ? email.getJob().getId() : null);
+        dto.setFollowUpEmailName(email.getFollowUpEmailName());
         return dto;
     }
 

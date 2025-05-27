@@ -3,4 +3,6 @@ export type CoverLetters = {
   content: string;
   createdAt: string;
   jobId: string;
+  coverLetterName: string;
+
 };

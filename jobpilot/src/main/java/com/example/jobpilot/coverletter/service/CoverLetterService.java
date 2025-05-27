@@ -1,6 +1,7 @@
 package com.example.jobpilot.coverletter.service;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public class CoverLetterService {
     private final CoverLetterRepository coverLetterRepository;
     private final CoverLetterMapper coverLetterMapper;
     @Transactional
-    public CoverLetterResponse generateCoverLetter(CoverLetterRequest request,User user) {
+    public CoverLetterDTO generateCoverLetter(CoverLetterRequest request,User user) {
     Resume resume = resumeRepository.findById(request.getResumeId())
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
@@ -51,9 +52,10 @@ public class CoverLetterService {
         coverLetter.setJob(job);
         coverLetter.setContent(coverLetterText);
         coverLetter.setCreatedAt(Instant.now());
+        coverLetter.setCoverLetterName(job.getCompany() + " - " + job.getTitle());
         coverLetterRepository.save(coverLetter);
-
-        return new CoverLetterResponse(coverLetterText);
+        CoverLetterDTO coverLetterDTO = coverLetterMapper.toDTO(coverLetter);
+        return coverLetterDTO;
     }
     public List<CoverLetterDTO> getAllCoverLettersByUser(User user) {
         return coverLetterRepository.findAllByJobUser(user).stream()
