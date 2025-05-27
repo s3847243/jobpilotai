@@ -34,7 +34,6 @@ public class ResumeService {
         String s3Url = s3Service.uploadFile(file);
         String resumeText = extractTextFromPdf(file);
         ParsedResumeDTO parsed = openAiService.extractResumeInfo(resumeText);
-
        Resume resume = Resume.builder()
                 .user(user)
                 .filename(file.getOriginalFilename())
@@ -44,6 +43,7 @@ public class ResumeService {
                 .parsedPhone(parsed.getPhone())
                 .parsedSkills(parsed.getSkills())
                 .parsedSummary(parsed.getSummary())
+                .atsScore(parsed.getAtsScore()) 
                 .uploadedAt(Instant.now())
                 .build();
 

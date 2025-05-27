@@ -17,3 +17,17 @@ export const getJobsByResumeId = async (resumeId: string): Promise<JobSummaryDTO
   const response = await axiosInstance.get(`/resume/${resumeId}/jobs`);
   return response.data;
 };
+
+
+export const uploadResume = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await axiosInstance.post('/resume/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};

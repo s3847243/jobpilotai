@@ -11,4 +11,6 @@ public class ParsedResumeDTO {
     private String phone;
     private List<String> skills;
     private String summary;
+    private Double atsScore;
+
 }

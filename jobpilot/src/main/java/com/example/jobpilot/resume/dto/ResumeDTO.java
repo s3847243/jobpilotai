@@ -15,14 +15,12 @@ public class ResumeDTO {
     private UUID id;
     private String filename;
     private String s3Url;
-
     private String parsedName;
     private String parsedEmail;
     private String parsedPhone;
     private List<String> parsedSkills;
     private String parsedSummary;
-
     private Instant uploadedAt;
-
+    private Double atsScore;
     private UUID userId; 
 }

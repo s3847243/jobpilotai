@@ -23,27 +23,20 @@ public class Resume {
     @Id
     @GeneratedValue
     private UUID id;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
     private String filename;
-
     private String s3Url;
-
     private String parsedName;
     private String parsedEmail;
     private String parsedPhone;
-
+    private Double atsScore;
     @ElementCollection
     private List<String> parsedSkills;
-
     @Column(columnDefinition = "TEXT")
     private String parsedSummary;
-
     private Instant uploadedAt;
-    
     @OneToMany(mappedBy = "resume")
     private List<Job> jobs;
 }

@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ResumeOverviewCard from './ResumeOverviewCard';
 import ResumeFeedbackSection from './ResumeFeedbackSection';
-import JobsLinkedTable from './JobsLinkedTable';
+
 import { useParams } from 'react-router-dom';
 import { matchJobWithResume } from '../../api/JobApi';
-// import ResumeActionButtons from './ResumeActionButtons'
 import { getJobById } from '../../api/JobApi';
 import { Job } from '../../api/JobApi';
 import { assignResumeToJob } from '../../api/JobApi';
-import { fetchResumes } from '../../api/ResumeApi';
+
 import { useNavigate } from 'react-router-dom';
 
 

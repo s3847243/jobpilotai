@@ -131,22 +131,23 @@ public class OpenAiService {
         return getRawResponse(prompt);
     }
     public ParsedResumeDTO extractResumeInfo(String resumeText) {
-        String prompt = """
-            Extract the following details from this resume text and return it as JSON with fields:
-            {
-              "name": "...",
-              "email": "...",
-              "phone": "...",
-              "skills": ["...", "..."],
-              "summary": "..."
-            }
-    
-            Resume Text:
-            """ + resumeText;
+    String prompt = """
+    Extract the following details from the resume text below. Return the response as a **single JSON object** with the following fields:
+
+    {
+    "name": "string",              // Candidate's full name
+    "email": "string",             // Email address
+    "phone": "string",             // Phone number
+    "skills": ["...", "..."],      // Key technical and soft skills
+    "atsScore": number,            // A number (0-100) representing how well this resume matches a typical job description
+    "summary": "string"            // A **concise overall summary** of the candidate's skills, experience, and impact (approx 3-4 sentences)
+    }
+
+    Resume Text:
+    """ + resumeText;
     
         try {
-            String jsonResponse = getRawResponse(prompt); // NOT openAiClient.callWithPrompt
-    
+            String jsonResponse = getRawResponse(prompt); 
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonResponse, ParsedResumeDTO.class);
         } catch (JsonProcessingException e) {

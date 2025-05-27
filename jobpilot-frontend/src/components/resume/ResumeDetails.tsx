@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getResumeById } from '../../api/ResumeApi';
 import { Resume } from '../../types/Resume';
 import { getJobsByResumeId } from '../../api/ResumeApi';
 import { JobSummaryDTO } from '../../types/JobSummaryDTO';
-
 import { 
   User, 
   Mail, 
@@ -42,6 +41,7 @@ const ResumeDetails: React.FC = () => {
     useEffect(() => {
     if (!resumeId) return;
     getResumeById(resumeId).then(setResume);
+
     getJobsByResumeId(resumeId).then(setJobs);
   }, [resumeId]);
   const getStatusIcon = (status: string) => {
@@ -88,7 +88,7 @@ const ResumeDetails: React.FC = () => {
 
 
   if (!resume) return <div className="p-6 text-center text-gray-500 animate-pulse">Loading resume details...</div>;
-
+  console.log(resume);
   return (
     <div className="min-h-screen bg-white from-slate-50 to-blue-50">
 
@@ -137,7 +137,7 @@ const ResumeDetails: React.FC = () => {
                     <User className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">{resume.filename}</h3>
+                    <h3 className="text-xl font-bold">{resume.parsedName}</h3>
                     <p className="text-blue-100">Professional Profile</p>
                   </div>
                 </div>
@@ -145,15 +145,11 @@ const ResumeDetails: React.FC = () => {
               <div className="p-6 space-y-4">
                 <div className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
                   <Mail className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm">{resume.filename}</span>
+                  <span className="text-sm">{resume.parsedEmail}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
                   <Phone className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm">{resume.filename}</span>
-                </div>
-                <div className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
-                  <MapPin className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm">{resume.filename}</span>
+                  <span className="text-sm">{resume.parsedPhone}</span>
                 </div>
               </div>
             </div>
@@ -202,8 +198,6 @@ const ResumeDetails: React.FC = () => {
                 {[
                   { id: 'overview', label: 'Overview', icon: User },
                   { id: 'skills', label: 'Skills', icon: Award },
-                  { id: 'experience', label: 'Experience', icon: Briefcase },
-                  { id: 'projects', label: 'Projects', icon: Code },
                   { id: 'applications', label: 'Applications', icon: Target }
                 ].map(({ id, label, icon: Icon }) => (
                   <button
@@ -243,7 +237,7 @@ const ResumeDetails: React.FC = () => {
                   </div>
                   <div className="prose max-w-none">
                     <p className="text-gray-700 leading-relaxed text-lg font-light">
-                      {resume.filename}
+                      {resume.parsedSummary}
                     </p>
                   </div>
                 </div>
@@ -278,7 +272,7 @@ const ResumeDetails: React.FC = () => {
                       </div>
                       <h3 className="font-bold text-gray-900 text-lg">Resume Score</h3>
                     </div>
-                    <p className="text-4xl font-bold text-purple-600 mb-2">9.2</p>
+                    <p className="text-4xl font-bold text-purple-600 mb-2">{Math.round(resume.atsScore/10)}</p>
                     <p className="text-gray-600">ATS Compatibility</p>
                   </div>
                 </div>
@@ -396,10 +390,12 @@ const ResumeDetails: React.FC = () => {
                       <Target className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                       <p className="text-gray-500 font-medium text-xl mb-2">No applications yet</p>
                       <p className="text-gray-400 mb-8">Start your job search journey today</p>
+                      <Link to="/dashboard/job-hub">
                       <button className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                         <span className="text-lg">Start Applying</span>
                         <ArrowRight className="w-5 h-5" />
                       </button>
+                      </Link>
                     </div>
                   ) : (
                     <div className="space-y-6">

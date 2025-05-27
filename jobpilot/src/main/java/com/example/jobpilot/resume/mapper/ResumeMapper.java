@@ -18,11 +18,9 @@ public class ResumeMapper {
         dto.setParsedPhone(resume.getParsedPhone());
         dto.setParsedSkills(resume.getParsedSkills());
         dto.setParsedSummary(resume.getParsedSummary());
+        dto.setAtsScore(resume.getAtsScore());
         dto.setUploadedAt(resume.getUploadedAt());
         dto.setUserId(resume.getUser().getUserId());
         return dto;
     }
-
-    
-    // fromDTO :TBA
 }
