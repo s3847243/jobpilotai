@@ -40,39 +40,6 @@ export const createJobFromUrl = async (url: string, resumeId?: string) => {
   return res.data;
 };
 
-// // GENERATE COVER LETTER
-// export const generateCoverLetter = async (jobId: string) => {
-//   const res = await axiosInstance.post(
-//     `/job/${jobId}/generate-cover-letter`
-//   );
-
-//   console.log(res.data);
-//   return res.data;
-// };
-
-
-// // GET COVER LETTER
-// export const getCoverLetter = async (jobId:string) => {
-//   const res = await axiosInstance.get(`/job/${jobId}/cover-letter`,{withCredentials: true});
-//   return res.data; // { coverLetter: "..." }
-// };
-
-// // Update existing cover letter
-// export const updateCoverLetter = async (jobId: string, text: string): Promise<void> => {
-//   await axiosInstance.put(`/job/${jobId}/cover-letter`, text, {
-//     headers: { 'Content-Type': 'text/plain' }
-//     ,withCredentials: true
-//   });
-// };
-
-// // Improve cover letter via instruction
-// export const improveCoverLetter = async (jobId: string, instruction: string): Promise<string> => {
-//   const res = await axiosInstance.post(`/job/${jobId}/improve-cover-letter`, {instruction} ,{withCredentials: true});
-//   console.log(res.data);
-
-//   return res.data;
-// };
-
 // Match resume to job — backend generates feedback, score, skills, etc.
 export const matchJobWithResume = async (jobId: string): Promise<Job> => {
   const res = await axiosInstance.get(`job/${jobId}/match`,{withCredentials: true});
@@ -92,13 +59,10 @@ export const updateJobStatus = async (jobId: string, status: string) => {
     `/job/${jobId}/status`,
     { status },
     {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      withCredentials: true
     }
   );
-
+  console.log(res.data);
   return res.data; 
 };
 

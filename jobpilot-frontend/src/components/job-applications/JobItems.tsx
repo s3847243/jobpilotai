@@ -49,7 +49,7 @@ const JobItems:React.FC<Props> = ({ job }) => {
   {open && (
     <div className="absolute left-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
       <div className="py-1">
-        {["Saved", "Applied", "Rejected"].map((option) => (
+        {["SAVED", "APPLIED", "REJECTED"].map((option) => (
           <div
             key={option}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"

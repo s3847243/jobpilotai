@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8080/api',
-  withCredentials: true, // ✅ this is required for sending cookies
+  withCredentials: true, // this is required for sending cookies
   headers: {
     'Content-Type': 'application/json',
-  } // ✅ add this here only
+  } 
 });
 let isRefreshing = false;
 let failedQueue: any[] = [];
@@ -20,7 +20,7 @@ const processQueue = (error: any, tokenRefreshed: boolean) => {
 axiosInstance.interceptors.response.use(
   res => res,
   async error => {
-    console.log("🔍 Axios interceptor triggered", error.response?.status); // ✅ Add this
+    console.log("🔍 Axios interceptor triggered", error.response?.status);
     const originalRequest = error.config;
     console.log(error.response);
     // If token expired & not already retried
