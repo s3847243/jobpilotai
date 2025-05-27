@@ -1,20 +1,58 @@
-
-import { Edit3 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Edit3, MoreVertical, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ConfirmModal from '../modal/ConfirmModal';
 
-const CoverLetterItem = ({ id, title, jobId, date }: {
+const CoverLetterItem = ({ id, title, jobId, date,onDelete }: {
   id: string;
   title: string;
   jobId:string;
 
   date: string;
+  onDelete: (id: string) => void;
 }) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+     const menuRef = useRef<HTMLDivElement>(null);
+     const [showConfirm, setShowConfirm] = useState(false);
+       const [loading, setLoading] = useState(false);
+  
+    useEffect(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+          setMenuOpen(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
   return (
     <div className="bg-white p-6 rounded-xl shadow-md flex flex-col gap-4 w-full max-w-sm">
       <div className="flex items-start justify-between">
         <h2 className="text-lg font-semibold break-words">{title}</h2>
-        <button className="text-gray-400 hover:text-gray-600">&#8942;</button>
-      </div>
+        <div ref={menuRef} className="relative">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <MoreVertical size={20} />
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+              <button
+                 onClick={() => {
+                setShowConfirm(true);
+                setMenuOpen(false);
+                }}
+                className="w-full text-left text-red-600 hover:bg-red-50 px-4 py-2 text-sm font-medium transition"
+              >
+                <Trash2 size={16} className="inline mr-2" />
+                Delete Letter
+              </button>
+            </div>
+          )}
+        </div>
+        </div>
       <div>
         <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full ">
           {new Date(date).toLocaleDateString()}
@@ -27,6 +65,17 @@ const CoverLetterItem = ({ id, title, jobId, date }: {
         <Edit3 size={18} />
         Editor
       </Link>
+           {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Delete Letter"
+        message="Are you sure you want to delete this resume? This action cannot be undone."
+        onConfirm={() => onDelete(id)}
+        onCancel={() => setShowConfirm(false)}
+        loading={loading}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

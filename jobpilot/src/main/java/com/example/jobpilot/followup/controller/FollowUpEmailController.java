@@ -54,9 +54,9 @@ public class FollowUpEmailController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
     @PostMapping("/generate/{jobId}")
-    public ResponseEntity<FollowUpEmailDTO> generateFollowUpEmail(@PathVariable UUID jobId,HttpServletRequest request) {
-        User user = getUserFromRequest(request);
-        FollowUpEmailDTO dto = followUpEmailService.generateFollowUpEmail(jobId, user.getUserId());
+    public ResponseEntity<FollowUpEmailDTO> generateFollowUpEmail(@PathVariable UUID jobId,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        
+        FollowUpEmailDTO dto = followUpEmailService.generateFollowUpEmail(jobId, userPrincipal.getUser());
         return ResponseEntity.ok(dto);
     }
 

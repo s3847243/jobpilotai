@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +30,8 @@ public class FollowUpEmail {
     @GeneratedValue
     private UUID id;
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
+    @JsonIgnore
     private User user;
     private String subject;
 

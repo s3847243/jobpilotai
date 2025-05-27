@@ -41,8 +41,8 @@ public class ResumeController {
 
 
     @DeleteMapping("/{resumeId}")
-    public ResponseEntity<String> deleteResume(@PathVariable UUID id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        resumeService.deleteResume(id, userPrincipal.getUser());
+    public ResponseEntity<String> deleteResume(@PathVariable UUID resumeId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        resumeService.deleteResume(resumeId, userPrincipal.getUser());
         return ResponseEntity.ok("Resume deleted successfully");
     }
 

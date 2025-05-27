@@ -3,7 +3,7 @@ import { Plus, X } from 'lucide-react';
 import JobItems from './JobItems';
 import JobTable from './JobTable';
 import { createJobFromUrl } from '../../api/JobApi';
-import { fetchJobs } from '../../api/JobApi';
+import { fetchJobs,deleteJobById } from '../../api/JobApi';
 import { fetchResumes } from '../../api/ResumeApi';
 import { Resume } from '../../types/Resume';
 export type Job = {
@@ -58,6 +58,17 @@ const JobApp = () => {
           alert('Failed to create job. Please try again.');
         }
       };
+      const handleDeleteJob = async (id: string) => {
+         
+      
+          try {
+            await deleteJobById(id); // Assume you have this API
+            setResumes((prev) => prev.filter((r) => r.id !== id));
+            console.log("Job deleted");
+          } catch (err) {
+            console.error("Failed to delete job:", err);
+          }
+        };
       return (
         <section>
           <div className="flex items-center justify-between">
@@ -72,7 +83,7 @@ const JobApp = () => {
           </div>
     
           <hr className="my-3 border-t-4 py-3" />
-          <JobTable jobs={jobs} />
+          <JobTable jobs={jobs} onDelete={handleDeleteJob} />
     
           {/* Modal */}
           {isOpen && (

@@ -57,3 +57,9 @@ export const getCoverLetterByJobId = async (jobId: string) => {
   const res = await axiosInstance.get(`/cover-letters/job/${jobId}`, { withCredentials: true });
   return res.data; // { id, text, createdAt, job: { id, ... }, ... }
 };
+
+
+export const deleteCoverLetterById = async (coverLetterId: string) => {
+  const response = await axiosInstance.delete(`/cover-letters/${coverLetterId}`);
+  return response.data;
+};

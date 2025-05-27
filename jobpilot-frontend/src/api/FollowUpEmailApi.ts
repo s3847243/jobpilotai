@@ -30,3 +30,8 @@ export const getAllFollowUpsForUser = async (): Promise<FollowUpEmail[]> => {
   console.log(response.data);
   return response.data;
 };
+
+export const deleteFollowUpEmailById = async (followUpId: string) => {
+  const response = await axiosInstance.delete(`/follow-up/${followUpId}`);
+  return response.data;
+};

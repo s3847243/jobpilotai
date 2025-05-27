@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import CoverLetterItem from './CoverLetterItem';
 import { fetchCoverLetters } from '../../api/CoverLetterApi';
 import { CoverLetters } from '../../types/CoverLetter';
-
+import { deleteCoverLetterById } from '../../api/CoverLetterApi';
 const CoverLetter = () => {
   const [coverLetters, setCoverLetters] = useState<CoverLetters[]>([]);
 
@@ -16,7 +16,16 @@ const CoverLetter = () => {
     };
     load();
   }, []);
-
+    const handleDeleteCoverLetter= async (id: string) => {
+  
+      try {
+        await deleteCoverLetterById(id);
+        setCoverLetters((prev) => prev.filter((r) => r.id !== id));
+        console.log("Cover Letter deleted");
+      } catch (err) {
+        console.error("Failed to delete letter:", err);
+      }
+    };
   return (
     <section>
       <div className="flex items-center justify-between">
@@ -32,6 +41,7 @@ const CoverLetter = () => {
           <CoverLetterItem
             key={cl.id}
             id={cl.id}
+            onDelete={handleDeleteCoverLetter}
             jobId = {cl.jobId}
             title={cl.coverLetterName}
             date={cl.createdAt}

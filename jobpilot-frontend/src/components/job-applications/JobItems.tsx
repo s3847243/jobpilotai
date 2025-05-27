@@ -1,14 +1,22 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Job } from './JobApp';
 import { updateJobStatus } from '../../api/JobApi';
+import { deleteJobById } from '../../api/JobApi';
+import ConfirmModal from '../modal/ConfirmModal';
 type Props = {
   job: Job;
+    onDelete:(id: string) => void;
 };
-const JobItems:React.FC<Props> = ({ job }) => {
-  const coverLetterId = "asd";
+const JobItems:React.FC<Props> = ({ job ,onDelete}) => {
+
   const [open, setOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(job.status);
+    const [showConfirm, setShowConfirm] = useState(false);
+      const [loading, setLoading] = useState(false);
+  
+
+
 
   const selectOption = async (option: string) => {
   try {
@@ -90,8 +98,24 @@ const JobItems:React.FC<Props> = ({ job }) => {
         </td>
 
         <td className="px-6 py-4">
-          <button className="text-red-500 hover:text-red-700 font-semibold">Delete</button>
+          <button 
+            onClick={() => {
+              setShowConfirm(true);
+            }}
+          className="text-red-500 hover:text-red-700 font-semibold">Delete</button>
         </td>
+
+           {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Delete Job"
+        message="Are you sure you want to delete this Job? This action cannot be undone."
+        onConfirm={() => onDelete(job.id)}
+        onCancel={() => setShowConfirm(false)}
+        loading={loading}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       </tr>
     );
   };

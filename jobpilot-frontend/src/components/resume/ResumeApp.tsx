@@ -4,6 +4,7 @@ import ResumeItem from './ResumeItem';
 import { fetchResumes } from '../../api/ResumeApi';
 import { Resume } from '../../types/Resume';
 import { uploadResume } from '../../api/ResumeApi';
+import { deleteResumeById } from '../../api/ResumeApi';
 const ResumeApp = () => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -23,6 +24,17 @@ const ResumeApp = () => {
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+  const handleDeleteResume = async (id: string) => {
+   
+
+    try {
+      await deleteResumeById(id); // Assume you have this API
+      setResumes((prev) => prev.filter((r) => r.id !== id));
+      console.log("Resume deleted");
+    } catch (err) {
+      console.error("Failed to delete resume:", err);
     }
   };
 
@@ -62,6 +74,7 @@ const ResumeApp = () => {
           <ResumeItem
             key={resume.id}
             id={resume.id}
+            onDelete={handleDeleteResume}
             name={resume.filename}
             date={new Date(resume.uploadedAt).toLocaleDateString()}
           />

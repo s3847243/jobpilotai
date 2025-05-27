@@ -26,7 +26,7 @@ public class FollowUpEmailService {
     private final OpenAiService openAiService;
     private final FollowUpEmailMapper followUpEmailMapper;
 
-    public FollowUpEmailDTO generateFollowUpEmail(UUID jobId, UUID userId) {
+    public FollowUpEmailDTO generateFollowUpEmail(UUID jobId, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
 
@@ -39,6 +39,7 @@ public class FollowUpEmailService {
 
         FollowUpEmail email = new FollowUpEmail();
         email.setJob(job);
+        email.setUser(user);
         email.setSubject("Following up on " + job.getTitle() + " at " + job.getCompany());
         email.setBody(content);
         email.setCreatedAt(Instant.now());

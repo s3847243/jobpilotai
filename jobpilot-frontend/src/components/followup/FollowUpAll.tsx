@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import FollowUpItem from './FollowUpItem';
 import { getAllFollowUpsForUser } from '../../api/FollowUpEmailApi';
 import { FollowUpEmail } from '../../types/FollowUpEmail';
+import { deleteFollowUpEmailById } from '../../api/FollowUpEmailApi';
 const FollowUpAll = () => {
   const [emails, setEmails] = useState<FollowUpEmail[]>([]);
 
@@ -17,7 +18,16 @@ const FollowUpAll = () => {
     };
     loadResumes();
   }, []);
+  const handleDeleteFollowUp= async (id: string) => {
 
+    try {
+      await deleteFollowUpEmailById(id);
+      setEmails((prev) => prev.filter((r) => r.id !== id));
+      console.log("Email deleted");
+    } catch (err) {
+      console.error("Failed to delete email:", err);
+    }
+  };
   return (
     <section>
       <div className="flex items-center justify-between">
@@ -35,6 +45,7 @@ const FollowUpAll = () => {
           <FollowUpItem
             key={email.id}
             id={email.id}
+            onDelete={handleDeleteFollowUp}
             name={email.followUpEmailName}
             jobId = {email.jobId}
             date={new Date(email.createdAt).toLocaleDateString()}

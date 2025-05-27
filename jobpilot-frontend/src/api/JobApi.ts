@@ -65,5 +65,9 @@ export const updateJobStatus = async (jobId: string, status: string) => {
   console.log(res.data);
   return res.data; 
 };
-
+// Delete Job by ID
+export const deleteJobById = async (jobId: string) => {
+  const response = await axiosInstance.delete(`/job/${jobId}`);
+  return response.data; // You can adjust based on what your backend returns (e.g., success message)
+};
 

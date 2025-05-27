@@ -31,3 +31,8 @@ export const uploadResume = async (file: File) => {
 
   return response.data;
 };
+
+export const deleteResumeById = async (resumeId: string) => {
+  const response = await axiosInstance.delete(`/resume/${resumeId}`);
+  return response.data;
+};
