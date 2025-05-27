@@ -4,12 +4,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.example.jobpilot.job.model.Job;
+import com.example.jobpilot.user.model.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +28,9 @@ public class FollowUpEmail {
     @Id
     @GeneratedValue
     private UUID id;
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     private String subject;
 
     @Column(columnDefinition = "TEXT")

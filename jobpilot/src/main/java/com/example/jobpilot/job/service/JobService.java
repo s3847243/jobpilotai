@@ -232,5 +232,15 @@ public class JobService {
         return jobMapper.toDTO(jobRepository.save(job));
 
     }
+    public void deleteJobById(UUID jobId, User user) {
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Access denied: You are not authorized to delete this job.");
+        }
+
+        jobRepository.delete(job);
+    }
     
 }

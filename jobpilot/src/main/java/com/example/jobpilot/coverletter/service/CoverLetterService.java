@@ -121,4 +121,15 @@ public class CoverLetterService {
     return coverLetterMapper.toDTO(coverLetter);
     }
 
+    public void deleteCoverLetter(UUID coverLetterId, User user) {
+        CoverLetter coverLetter = coverLetterRepository.findById(coverLetterId)
+            .orElseThrow(() -> new RuntimeException("Cover Letter not found"));
+
+        if (!coverLetter.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Access denied: You are not authorized to delete this cover letter.");
+        }
+
+        coverLetterRepository.delete(coverLetter);
+    }
+
 }

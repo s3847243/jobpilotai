@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import com.example.jobpilot.followup.dto.ImproveEmailRequest;
 
 import com.example.jobpilot.followup.service.FollowUpEmailService;
 import com.example.jobpilot.user.model.User;
+import com.example.jobpilot.user.model.UserPrincipal;
 import com.example.jobpilot.user.repository.UserRepository;
 
 import jakarta.servlet.http.Cookie;
@@ -81,5 +84,13 @@ public class FollowUpEmailController {
          User user = getUserFromRequest(httpServletRequest);
         FollowUpEmailDTO dto = followUpEmailService.improveFollowUpEmail(followUpId, user.getUserId(), request.getInstructions());
         return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/{followUpEmailId}")
+    public ResponseEntity<?> deleteFollowUpEmail(
+            @PathVariable UUID followUpEmailId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        followUpEmailService.deleteFollowUpEmail(followUpEmailId, userPrincipal.getUser());
+        return ResponseEntity.ok("Follow-up email deleted successfully.");
     }
 }

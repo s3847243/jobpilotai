@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-pdfminer.six
-spacy
-python-multipart

@@ -13,6 +13,8 @@ import com.example.jobpilot.followup.model.FollowUpEmail;
 import com.example.jobpilot.followup.repository.FollowUpEmailRepository;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.repository.JobRepository;
+import com.example.jobpilot.user.model.User;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -78,7 +80,6 @@ public class FollowUpEmailService {
         return followUpEmailMapper.toDTO(updated);
     }
 
-    // 🔧 Prompt builder helpers
     private String buildFollowUpPrompt(Job job) {
         return String.format("""
             Write a polite and professional follow-up email for the position of %s at %s. 
@@ -91,5 +92,16 @@ public class FollowUpEmailService {
             The user has written this follow-up email:\n\n%s\n\n
             Please improve or modify it based on the following instructions:\n%s
         """, email.getBody(), userInstructions);
+    }
+
+    public void deleteFollowUpEmail(UUID followUpEmailId, User user) {
+        FollowUpEmail followUpEmail = followUpEmailRepository.findById(followUpEmailId)
+            .orElseThrow(() -> new RuntimeException("Follow-up email not found"));
+
+        if (!followUpEmail.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Access denied: You are not authorized to delete this follow-up email.");
+        }
+
+        followUpEmailRepository.delete(followUpEmail);
     }
 }
