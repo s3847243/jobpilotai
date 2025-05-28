@@ -1,33 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
-import { Job } from './JobApp';
-import { updateJobStatus } from '../../api/JobApi';
-import { deleteJobById } from '../../api/JobApi';
+import { Job } from '../../api/JobApi';
 import ConfirmModal from '../modal/ConfirmModal';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store';
+import { updateJobStatusThunk ,deleteJobThunk} from '../../features/jobs/jobsThunk';
 type Props = {
   job: Job;
-    onDelete:(id: string) => void;
 };
-const JobItems:React.FC<Props> = ({ job ,onDelete}) => {
+const JobItems:React.FC<Props> = ({ job}) => {
 
   const [open, setOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(job.status);
-    const [showConfirm, setShowConfirm] = useState(false);
-      const [loading, setLoading] = useState(false);
-  
-
-
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const selectOption = async (option: string) => {
-  try {
-    await updateJobStatus(job.id, option);
-    setSelectedOption(option);
-  } catch (error) {
-    console.error("Failed to update job status:", error);
-  } finally {
-    setOpen(false); // Close dropdown
-  }
-};
+    try {
+      await dispatch(updateJobStatusThunk({ jobId: job.id, status: option }));
+      setSelectedOption(option);
+    } catch (error) {
+      console.error("Failed to update job status:", error);
+    } finally {
+      setOpen(false);
+    }
+  };
+    const handleDelete = () => {
+    dispatch(deleteJobThunk(job.id)); // Directly dispatch the thunk
+  };
   return (
       <tr className="border-t hover:bg-gray-50">
           <td className="px-6 py-4">
@@ -110,7 +111,7 @@ const JobItems:React.FC<Props> = ({ job ,onDelete}) => {
         isOpen={showConfirm}
         title="Delete Job"
         message="Are you sure you want to delete this Job? This action cannot be undone."
-        onConfirm={() => onDelete(job.id)}
+        onConfirm={handleDelete}
         onCancel={() => setShowConfirm(false)}
         loading={loading}
         confirmText="Delete"

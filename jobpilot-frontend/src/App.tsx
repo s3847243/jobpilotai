@@ -11,6 +11,7 @@ import FollowUpEmailPage from './components/followup/FollowUpEmailPage';
 import FollowUpAll from './components/followup/FollowUpAll'
 import ResumeDetails from './components/resume/ResumeDetails';
 import Register from './pages/Register'
+
 function App() {
   return (
     <BrowserRouter>

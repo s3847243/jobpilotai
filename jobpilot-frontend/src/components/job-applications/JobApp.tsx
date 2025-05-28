@@ -1,74 +1,79 @@
 import React, { useEffect, useState } from 'react'
 import { Plus, X } from 'lucide-react';
-import JobItems from './JobItems';
 import JobTable from './JobTable';
 import { createJobFromUrl } from '../../api/JobApi';
 import { fetchJobs,deleteJobById } from '../../api/JobApi';
 import { fetchResumes } from '../../api/ResumeApi';
 import { Resume } from '../../types/Resume';
-export type Job = {
-  id: string;
-  status: string;
-  company: string;
-  resume: Resume;
-  coverLetter: string | null;
-  location: string;
-  matchScore:string ;
-  matchFeedback:string;
-  employmentType:string;
-  title:string;
-  url:string;
-};
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { fetchJobsThunk, createJobThunk } from '../../features/jobs/jobsThunk';
+
+
 
 const JobApp = () => {
-      const [jobs , setJobs] = useState<Job[]>([]);
-      const [isOpen, setIsOpen] = useState(false);
-      const [jobUrl, setJobUrl] = useState('');
-      const [resumeFile, setResumeFile] = useState<File | null>(null);
-        const [resumes, setResumes] = useState<Resume[]>([]);
-  const [selectedResumeId, setSelectedResumeId] = useState<string>('');
-      useEffect(() => {
-        const loadJobs = async () => {
-          try {
-            const jobList = await fetchJobs();
-            setJobs(jobList);
-          } catch (error) {
-            console.error('Error fetching jobs:', error);
-          }
-        };
-        const loadResumes = async () => {
-          const resumeList = await fetchResumes();
-          setResumes(resumeList);
-        };
-        loadJobs();
-        loadResumes();
-
-      }, []);
-      const handleSubmit = async (e: any) => {
-        e.preventDefault();
-
-        try {
-          const newJob = await createJobFromUrl(jobUrl, selectedResumeId); // selectedResumeId may be ""
-          setJobs(prev => [...prev, newJob]);
-          setJobUrl('');
-          setSelectedResumeId('');
-          setIsOpen(false);
-        } catch (error) {
-          console.error('Error creating job:', error);
-          alert('Failed to create job. Please try again.');
-        }
+    const [isOpen, setIsOpen] = useState(false);
+    const [jobUrl, setJobUrl] = useState('');
+    const [resumeFile, setResumeFile] = useState<File | null>(null);
+    const [resumes, setResumes] = useState<Resume[]>([]);
+    const [selectedResumeId, setSelectedResumeId] = useState<string>('');
+    const dispatch = useDispatch<AppDispatch>();
+    const { jobs, loading, error } = useSelector((state: RootState) => state.jobs);
+    useEffect(() => {
+      // const loadJobs = async () => {
+      //   try {
+      //     const jobList = await fetchJobs();
+      //     setJobs(jobList);
+      //   } catch (error) {
+      //     console.error('Error fetching jobs:', error);
+      //   }
+      // };
+      const loadResumes = async () => {
+        const resumeList = await fetchResumes();
+        setResumes(resumeList);
       };
-      const handleDeleteJob = async (id: string) => {
+      //loadJobs();
+      loadResumes();
+
+    }, []);
+
+    useEffect(() => {
+      dispatch(fetchJobsThunk());
+    }, [dispatch]);
+
+      // const handleSubmit = async (e: any) => {
+      //   e.preventDefault();
+
+      //   try {
+      //     const newJob = await createJobFromUrl(jobUrl, selectedResumeId); // selectedResumeId may be ""
+      //     setJobs(prev => [...prev, newJob]);
+      //     setJobUrl('');
+      //     setSelectedResumeId('');
+      //     setIsOpen(false);
+      //   } catch (error) {
+      //     console.error('Error creating job:', error);
+      //     alert('Failed to create job. Please try again.');
+      //   }
+      //  };
+    const handleSubmit = async (e: any) => {
+      e.preventDefault();
+      dispatch(createJobThunk({ url: jobUrl, resumeId: selectedResumeId }));
+      setJobUrl('');
+      setSelectedResumeId('');
+      setIsOpen(false);
+    };
+
+      // const handleDeleteJob = async (id: string) => {
          
       
-          try {
-            await deleteJobById(id); // Assume you have this API
-            setResumes((prev) => prev.filter((r) => r.id !== id));
-            console.log("Job deleted");
-          } catch (err) {
-            console.error("Failed to delete job:", err);
-          }
-        };
+      //     try {
+      //       await deleteJobById(id); // Assume you have this API
+      //       setResumes((prev) => prev.filter((r) => r.id !== id));
+      //       console.log("Job deleted");
+      //     } catch (err) {
+      //       console.error("Failed to delete job:", err);
+      //     }
+      //   };
       return (
         <section>
           <div className="flex items-center justify-between">
@@ -83,7 +88,7 @@ const JobApp = () => {
           </div>
     
           <hr className="my-3 border-t-4 py-3" />
-          <JobTable jobs={jobs} onDelete={handleDeleteJob} />
+          <JobTable jobs={jobs} />
     
           {/* Modal */}
           {isOpen && (
@@ -137,7 +142,6 @@ const JobApp = () => {
                   )}
                 </form>
               </div>
-              
             </div>
           )}
         </section>

@@ -1,11 +1,10 @@
 import React from "react";
 import JobItems from "./JobItems"; // assuming you split the row into another file
-import { Job } from "./JobApp";
+import { Job } from "../../api/JobApi";
 export type Props = {
   jobs: Job[];
-  onDelete: (id: string) => void;
 };
-const JobTable: React.FC<Props>  = ({ jobs,onDelete }) => {
+const JobTable: React.FC<Props>  = ({ jobs }) => {
   return (
     <div className="overflow:visible rounded-xl shadow bg-white">
       <table className="w-full table-auto">
@@ -22,7 +21,7 @@ const JobTable: React.FC<Props>  = ({ jobs,onDelete }) => {
 
         <tbody>
           {jobs.map((job) => (
-            <JobItems key={job.id} job={job} onDelete={onDelete} />
+            <JobItems key={job.id} job={job} />
           ))}
         </tbody>
       </table>

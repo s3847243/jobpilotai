@@ -1,0 +1,62 @@
+// src/features/followUp/followUpSlice.ts
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchAllFollowUpsThunk, getFollowUpByIdThunk, generateFollowUpThunk, improveFollowUpThunk, deleteFollowUpThunk } from './followUpThunk';
+import { FollowUpEmail } from '../../types/FollowUpEmail';
+
+interface FollowUpState {
+  followUps: FollowUpEmail[];
+  currentFollowUp: FollowUpEmail | null;
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: FollowUpState = {
+  followUps: [],
+  currentFollowUp: null,
+  loading: false,
+  error: null,
+};
+
+const followUpSlice = createSlice({
+  name: 'followUp',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // Fetch All
+      .addCase(fetchAllFollowUpsThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllFollowUpsThunk.fulfilled, (state, action) => {
+        state.followUps = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchAllFollowUpsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Get By ID
+      .addCase(getFollowUpByIdThunk.fulfilled, (state, action) => {
+        state.currentFollowUp = action.payload;
+      })
+
+      // Generate
+      .addCase(generateFollowUpThunk.fulfilled, (state, action) => {
+        state.followUps.push(action.payload);
+      })
+
+      // Improve
+      .addCase(improveFollowUpThunk.fulfilled, (state, action) => {
+        state.currentFollowUp = action.payload;
+      })
+
+      // Delete
+      .addCase(deleteFollowUpThunk.fulfilled, (state, action) => {
+        state.followUps = state.followUps.filter((f) => f.id !== action.payload);
+      });
+  },
+});
+
+export default followUpSlice.reducer;
