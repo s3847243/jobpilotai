@@ -5,7 +5,7 @@ import { logoutUserThunk, loginUserThunk,updateUserThunk,deleteAccountThunk } fr
 
 interface UserState {
   id: string | null;
-  name: string | null;
+  fullName: string | null;
   email: string | null;
   loading: boolean;
   error: string | null;
@@ -13,7 +13,7 @@ interface UserState {
 
 const initialState: UserState = {
   id: null,
-  name: null,
+  fullName: null,
   email: null,
   loading: false,
   error: null,
@@ -25,33 +25,48 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Logout
-      .addCase(logoutUserThunk.fulfilled, (state) => {
-        state.id = null;
-        state.name = null;
-        state.email = null;
-
+           // Login 
+      .addCase(loginUserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-
-      // Login 
       .addCase(loginUserThunk.fulfilled, (state, action) => {
+        state.loading = false;
         state.id = action.payload.id;
-        state.name = action.payload.name;
+        state.fullName = action.payload.fullName;
         state.email = action.payload.email;
-
+        state.error = null;
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as string;
-
       })
-       // Update User
+
+      // Logout
+      .addCase(logoutUserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logoutUserThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.id = null;
+        state.fullName = null;
+        state.email = null;
+        state.error = null;
+      })
+      .addCase(logoutUserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Update User
       .addCase(updateUserThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateUserThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.name = action.payload.name ?? state.name;
+        state.fullName = action.payload.fullName ?? state.fullName;
         state.email = action.payload.email ?? state.email;
         state.error = null;
       })
@@ -68,9 +83,8 @@ const userSlice = createSlice({
       .addCase(deleteAccountThunk.fulfilled, (state) => {
         state.loading = false;
         state.id = null;
-        state.name = null;
+        state.fullName = null;
         state.email = null;
-
         state.error = null;
       })
       .addCase(deleteAccountThunk.rejected, (state, action) => {

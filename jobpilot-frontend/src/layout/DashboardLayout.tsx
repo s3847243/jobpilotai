@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import {  useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar'
 import SidebarItem from '../components/sidebar/SidebarItem';    
@@ -6,8 +6,6 @@ import { BarChart3, Mail } from 'lucide-react'
 import { Settings } from 'lucide-react' 
 import { File } from 'lucide-react'
 import { Edit } from 'lucide-react'
-import { Moon } from 'lucide-react'
-
 
 const DashboardLayout = () => {
     const [activeItem, setActiveItem] = useState('/dashboard/job-hub');
@@ -54,13 +52,7 @@ const DashboardLayout = () => {
             active={activeItem === '/dashboard/settings'}
             onClick={() => setActiveItem('/dashboard/settings')}
           />
-          <SidebarItem 
-            icon={<Moon size={20} />} 
-            text="Theme" 
-            to="/dashboard/theme" 
-            active={activeItem === '/dashboard/theme'}
-            onClick={() => setActiveItem('/dashboard/theme')}
-          />
+
         </div>
       </Sidebar>
       
@@ -85,7 +77,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       </div> */}
-      <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-y-auto bg-gray-50 ">
         <Outlet />
       </div>
     </div>

@@ -1,28 +1,29 @@
 import { useState } from "react";
-import { login } from "../api/AuthApi";
 import { useNavigate } from "react-router-dom";
-
+import { AppDispatch, RootState } from "../store";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUserThunk } from "../features/user/userThunk";
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [newError, setnewError] = useState("");
+  // const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
+  const { loading, error } = useSelector((state: RootState) => state.users);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setnewError("");
 
-    try {
-      const data = await login(email, password);
-      console.log(data);
-      navigate("/dashboard"); // redirect after login
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
+    dispatch(loginUserThunk({ email, password }))
+      .unwrap()
+      .then(() => {
+        navigate("/dashboard"); // Redirect on success
+      })
+      .catch((err) => {
+        setnewError(err || "Login failed");
+      });
   };
 
   return (
@@ -52,8 +53,8 @@ function Login() {
             />
           </div>
 
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
+          {newError && (
+            <div className="text-red-500 text-sm">{newError}</div>
           )}
 
           <button

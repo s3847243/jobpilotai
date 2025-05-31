@@ -1,4 +1,4 @@
-import React, { createContext, useState,ReactNode } from 'react'
+import { createContext, useState,ReactNode } from 'react'
 import { MoreVertical, ChevronLast, ChevronFirst, BarChart3, User } from "lucide-react"
 type SidebarContextType = {
     expanded: boolean;
@@ -14,7 +14,7 @@ type SidebarProps = {
 const Sidebar = ({ children }: SidebarProps) => {
     const [expanded,setExpanded] = useState(true);
       const user = useSelector((state: RootState) => state.users); // Assuming your slice name is "users"
-
+      console.log(user);
 return (
     <aside className={`
       transition-all duration-300 ease-in-out bg-white
@@ -80,7 +80,7 @@ return (
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <h4 className="text-sm font-semibold text-gray-900 truncate">
-                   {user.name || 'Guest User'}
+                   {user.fullName || 'Guest User'}
                   </h4>
                   <p className="text-xs text-gray-500 truncate">
                     {user.email || 'Not logged in'}
