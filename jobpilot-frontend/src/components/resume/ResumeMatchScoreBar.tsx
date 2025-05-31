@@ -1,5 +1,5 @@
 import { Target } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // Resume Match Score Bar Component
 const ResumeMatchScoreBar = ({ score }: { score: number }) => {
   const [animatedScore, setAnimatedScore] = useState(0);

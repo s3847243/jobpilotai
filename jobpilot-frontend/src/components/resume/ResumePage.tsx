@@ -1,60 +1,59 @@
 import { useEffect, useState } from 'react';
 import ResumeOverviewCard from './ResumeOverviewCard';
 import ResumeFeedbackSection from './ResumeFeedbackSection';
-
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { matchJobWithResume } from '../../api/JobApi';
-import { getJobById } from '../../api/JobApi';
-import { Job } from '../../api/JobApi';
-import { assignResumeToJob } from '../../api/JobApi';
-
+import { AppDispatch, RootState } from '../../store';
 import { useNavigate } from 'react-router-dom';
-
+import { fetchJobByIdThunk, matchJobThunk, assignResumeThunk } from '../../features/jobs/jobsThunk';
 
 const ResumePage = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const [job, setJob] = useState<Job | null>(null); 
-const [reloadTrigger, setReloadTrigger] = useState(0);
-const navigate = useNavigate();
-useEffect(() => {
+  // const [job, setJob] = useState<Job | null>(null); 
+  const [reloadTrigger, setReloadTrigger] = useState(0);
+  const navigate = useNavigate();
+    const job = useSelector((state: RootState) =>
+    state.jobs.jobs.find((j) => j.id === jobId)
+  );
+  const loading = useSelector((state: RootState) => state.jobs.loading);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (!jobId) return;
+
     const fetchAndMatchJob = async () => {
-      if (!jobId) return;
-
       try {
-        // Step 1: Get the job
-        let jobData = await getJobById(jobId);
+        const jobData = await dispatch(fetchJobByIdThunk(jobId)).unwrap();
 
-        // Step 2: If match data is missing, call match API
         const needsMatching =
           !jobData.matchFeedback || !jobData.matchScore || !jobData.missingSkills;
 
         if (needsMatching) {
-          jobData = await matchJobWithResume(jobId);
+          await dispatch(matchJobThunk(jobId)).unwrap();
         }
-        console.log(jobData);
-        setJob(jobData);
       } catch (error) {
         console.error('Failed to fetch or match job:', error);
       }
     };
 
     fetchAndMatchJob();
-  }, [jobId, reloadTrigger]);
+  }, [dispatch, jobId, reloadTrigger]);
+
   if (!job) return <div>Loading...</div>;
 
-const handleReplace = async (resumeId: string) => {
-  if (!jobId) return;
-  console.log(resumeId);
-  try {
-    const updatedJob = await assignResumeToJob(jobId, resumeId);
-    setJob(updatedJob);
-    setReloadTrigger((prev) => prev + 1);
-  } catch (error) {
-    console.error("Failed to assign resume:", error);
-  }
-};
+  const handleReplace = (resumeId: string) => {
+    if (!jobId) return;
+    dispatch(assignResumeThunk({ jobId, resumeId }))
+      .unwrap()
+      .then(() => {
+        console.log('Resume assigned successfully');
+        setReloadTrigger((prev) => prev + 1);
+      })
+      .catch((error) => {
+        console.error('Failed to assign resume:', error);
+      });
+  };
 
-  
   return (
     <div className="max-w-6xl mx-auto p-6 flex flex-col gap-8">
       

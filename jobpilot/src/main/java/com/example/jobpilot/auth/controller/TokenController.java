@@ -17,6 +17,9 @@ import com.example.jobpilot.auth.dto.AuthResponse;
 import com.example.jobpilot.auth.dto.TokenRefreshRequest;
 import com.example.jobpilot.auth.model.RefreshToken;
 import com.example.jobpilot.user.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletResponse;
+
 import com.example.jobpilot.auth.service.JwtService;
 import com.example.jobpilot.auth.service.RefreshTokenService;
 import com.example.jobpilot.user.dto.UserDTO;
@@ -65,15 +68,27 @@ public ResponseEntity<AuthResponse> refreshToken(@CookieValue(value = "refreshTo
                     .build());
 }
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
-        String jwt = authHeader.substring(7);
-        String userEmail = jwtService.extractEmail(jwt);
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // Clear cookies by setting max-age=0
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", "")
+            .httpOnly(true)
+            .secure(false) // Only in production!
+            .path("/")
+            .maxAge(0)
+            .sameSite("Lax")
+            .build();
 
-        User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(0)
+            .sameSite("Lax")
+            .build();
 
-        refreshTokenService.revokeByUserId(user.getUserId());
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
 
-        return ResponseEntity.ok("User logged out successfully");
+        return ResponseEntity.ok().build();
     }
 }

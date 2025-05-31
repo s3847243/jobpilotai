@@ -1,22 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Edit3, Trash2, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../modal/ConfirmModal';
+import { AppDispatch,RootState } from '../../store';
+import { useDispatch } from 'react-redux';
+import { deleteResumeByIdThunk } from '../../features/resume/resumesThunk';
+
 const ResumeItem = ({
   id,
   name,
   date,
-  onDelete,
+
 }: {
   id: string;
   name: string;
   date: string;
-  onDelete: (id: string) => void;
+
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -27,7 +32,12 @@ const ResumeItem = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+    const handleDeleteResume = () => {
+    dispatch(deleteResumeByIdThunk(id))
+      .unwrap()
+      .then(() => console.log('Resume deleted'))
+      .catch((err) => console.error('Failed to delete resume:', err));
+  };
   return (
     <div className="bg-white p-6 rounded-xl shadow-md flex flex-col gap-4 w-full max-w-sm relative">
       <div className="flex items-start justify-between">
@@ -75,7 +85,7 @@ const ResumeItem = ({
         isOpen={showConfirm}
         title="Delete Resume"
         message="Are you sure you want to delete this resume? This action cannot be undone."
-        onConfirm={() => onDelete(id)}
+        onConfirm={handleDeleteResume}
         onCancel={() => setShowConfirm(false)}
         loading={loading}
         confirmText="Delete"

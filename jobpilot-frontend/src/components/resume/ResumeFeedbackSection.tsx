@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ResumeMatchScoreBar from './ResumeMatchScoreBar'; // assuming it's in components folder
 import { fetchResumes } from '../../api/ResumeApi';
 import { Star, CheckCircle, Zap, Upload, FileText } from 'lucide-react';
+import { AppDispatch,RootState    } from '../../store';
+import { fetchResumesThunk } from '../../features/resume/resumesThunk';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ResumeFeedbackSection = ({
   feedback,
@@ -12,25 +15,34 @@ const ResumeFeedbackSection = ({
   feedback: string;
   matchScore: number;
   missingSkills: string[];
-  onReplace: (resumeId: string) => void;  // Update this to accept a resumeId
+  onReplace: (resumeId: string) => void;  
 
 }) => {
-  const [resumes, setResumes] = useState<{ id: string; filename: string }[]>([]);
   const [selectedResume, setSelectedResume] = useState<string>("");
   const [isAnimated, setIsAnimated] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const resumes = useSelector((state: RootState) => state.resumes.resumes);
+  const loading = useSelector((state: RootState) => state.resumes.loading);
+  const error = useSelector((state: RootState) => state.resumes.error);
+
   useEffect(() => {
-    fetchResumes().then(setResumes).catch(console.error);
-  }, []);
+    dispatch(fetchResumesThunk())
+      .unwrap()
+      .catch(console.error);
+  }, [dispatch]);
 
   const handleAssign = () => {
       if (!selectedResume) {
         setErrorMessage("Please select a resume before proceeding.");
         return;
       }
-      setErrorMessage(null); // Clear previous error
+      setErrorMessage(null); 
       onReplace(selectedResume);
   };
+
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
       <div className="bg-gradient-to-r from-slate-50 to-slate-100 p-8 border-b border-slate-200">

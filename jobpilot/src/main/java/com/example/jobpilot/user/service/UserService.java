@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.user.repository.UserRepository;
-import com.example.jobpilot.user.dto.UpdateUserRequest;
 import com.example.jobpilot.user.dto.UserDTO;
+import com.example.jobpilot.user.dto.UserProfileUpdateRequest;
 import com.example.jobpilot.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -24,24 +24,18 @@ public class UserService {
         return mapToDto(user);
     }
 
-    public UserDTO updateUser(String email, UpdateUserRequest request) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDTO updateProfile(User user, UserProfileUpdateRequest request) {
+        if (request.getName() != null) user.setFullName(request.getName());
+        if (request.getLocation() != null) user.setLocation(request.getLocation());
+        if (request.getJobTitle() != null) user.setJobTitle(request.getJobTitle());
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
 
-        if (request.getFullName() != null) {
-            user.setFullName(request.getFullName());
-        }
-        if (request.getJobTitle() != null) {
-            user.setJobTitle(request.getJobTitle());
-        }
-        if (request.getLocation() != null) {
-            user.setLocation(request.getLocation());
-        }
-
-        user.setUpdatedAt(Instant.now());
         userRepository.save(user);
+        return UserDTO.from(user);
+    }
 
-        return mapToDto(user);
+    public void deleteAccount(User user) {
+        userRepository.delete(user);
     }
 
     private UserDTO mapToDto(User user) {

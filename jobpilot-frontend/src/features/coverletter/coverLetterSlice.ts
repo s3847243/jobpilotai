@@ -26,43 +26,76 @@ const coverLetterSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch all cover letters
+      // Fetch All
       .addCase(fetchCoverLettersThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchCoverLettersThunk.fulfilled, (state, action) => {
-        state.coverLetters = action.payload;
         state.loading = false;
+        state.coverLetters = action.payload;
       })
       .addCase(fetchCoverLettersThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload || 'Failed to fetch cover letters';
       })
 
-      // Generate new cover letter
-      .addCase(generateCoverLetterThunk.fulfilled, (state, action) => {
-        state.coverLetters.push(action.payload);
+      // Get by ID
+      .addCase(getCoverLetterByIdThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-
-      // Delete cover letter
-      .addCase(deleteCoverLetterThunk.fulfilled, (state, action) => {
-        state.coverLetters = state.coverLetters.filter((cl) => cl.id !== action.payload);
-      })
-       // Get cover letter by ID
       .addCase(getCoverLetterByIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
         state.selectedCoverLetter = action.payload;
       })
       .addCase(getCoverLetterByIdThunk.rejected, (state, action) => {
-        state.error = action.payload as string;
+        state.loading = false;
+        state.error = action.payload || 'Failed to get cover letter';
       })
 
-      // Improve cover letter
+      // Generate
+      .addCase(generateCoverLetterThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateCoverLetterThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.coverLetters.push(action.payload);
+      })
+      .addCase(generateCoverLetterThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to generate cover letter';
+      })
+
+      // Improve
+      .addCase(improveCoverLetterThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(improveCoverLetterThunk.fulfilled, (state, action) => {
-        state.improvedText = action.payload;
+        state.loading = false;
+        if (state.selectedCoverLetter) {
+          state.selectedCoverLetter.content = action.payload;
+        }
       })
       .addCase(improveCoverLetterThunk.rejected, (state, action) => {
-        state.error = action.payload as string;
+        state.loading = false;
+        state.error = action.payload || 'Failed to improve cover letter';
+      })
+
+      // Delete
+      .addCase(deleteCoverLetterThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteCoverLetterThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.coverLetters = state.coverLetters.filter(cl => cl.id !== action.payload);
+      })
+      .addCase(deleteCoverLetterThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to delete cover letter';
       });
   },
 });

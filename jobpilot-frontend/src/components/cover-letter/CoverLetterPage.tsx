@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { generateCoverLetter,improveCoverLetter,getCoverLetterById } from '../../api/CoverLetterApi';
-import { getJobById, Job } from '../../api/JobApi';
 import { useNavigate } from 'react-router-dom';
 import { downloadAsPdf } from '../followup/DownloadAsPdf';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { fetchJobByIdThunk } from '../../features/jobs/jobsThunk'
+import { getCoverLetterByIdThunk, generateCoverLetterThunk, improveCoverLetterThunk } from '../../features/coverletter/coverLetterThunks';
 interface ChatMessage {
   id: number;
   text: string;
@@ -11,76 +13,79 @@ interface ChatMessage {
 }
 const CoverLetterPage = () => {
   const {jobId} = useParams<{ jobId: string }>();
-  const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const[job, setJob] = useState<Job>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [nextId, setNextId] = useState(0);
-const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const job = useSelector((state: RootState) =>
+    state.jobs.jobs.find(j => j.id === jobId)
+  );
+  const coverLetter = useSelector((state: RootState) => state.coverLetters.selectedCoverLetter?.content);
+  const loading = useSelector((state: RootState) => state.coverLetters.loading);
 
-  useEffect(() => {
-    const loadCoverLetter = async () => {
-      if (!jobId) return;
+ useEffect(() => {
+    if (!jobId) return;
 
-      try {
-        const currentJob = await getJobById(jobId);
-        setJob(currentJob);
-
-        if (currentJob.coverLetterId) {
-          const { content } = await getCoverLetterById(currentJob.coverLetterId);
-          setCoverLetter(content);
-        } else {
-          setCoverLetter(null); 
+    dispatch(fetchJobByIdThunk(jobId))
+      .unwrap()
+      .then((job) => {
+        if (job.coverLetterId) {
+          dispatch(getCoverLetterByIdThunk(job.coverLetterId));
         }
+      })
+      .catch((err) => {
+        console.error('Failed to load job or cover letter:', err);
+      });
+  }, [dispatch, jobId]);
 
-      } catch (error) {
-        console.error("Failed to load job or cover letter:", error);
+
+  const handleGenerate = () => {
+      if (!job || !job.resumeId) {
+        alert('No resume found for this job.');
+        return;
       }
-    };
 
-    loadCoverLetter();
-  }, [jobId]);
-  const handleGenerate = async () => {
-    if (!job || !job.resumeId) {
-      alert("No resume found for this job.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const data = await generateCoverLetter(job.id, job.resumeId);
-      console.log(data);
-
-      setCoverLetter(data.coverLetterText);
-    } catch (err) {
-      console.error("Failed to generate cover letter", err);
-    }
-    setLoading(false);
+      dispatch(generateCoverLetterThunk({ jobId: job.id, resumeId: job.resumeId }))
+        .unwrap()
+        .then(() => {
+          console.log('Cover letter generated!');
+        })
+        .catch((err) => {
+          console.error('Failed to generate cover letter:', err);
+        });
   };
-  const handleImprove = async () => {
-    if (!input.trim()) return;
-    setLoading(true);
-    // Save message in local chat history
-    const id = nextId;
-    setNextId(prev => prev + 1);
 
-    // Add message with animation disabled
-    setMessages(prev => [...prev, { id, text: input, animate: false }]);
+  const handleImprove = () => {
+      if (!input.trim() || !jobId) return;
 
-    // Activate animation in next tick
-    setTimeout(() => {
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === id ? { ...msg, animate: true } : msg
-        )
-      );
-    }, 10); // minimal delay to trigger transition
-    const updated = await improveCoverLetter(jobId!, input);
-    setInput('');
-    setCoverLetter(updated);
-    setLoading(false);
+      const id = nextId;
+      setNextId(prev => prev + 1);
+
+      // Add message with animation disabled
+      setMessages(prev => [...prev, { id, text: input, animate: false }]);
+
+      // Activate animation in next tick
+      setTimeout(() => {
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === id ? { ...msg, animate: true } : msg
+          )
+        );
+      }, 10);
+
+      dispatch(improveCoverLetterThunk({ coverLetterId: jobId, instruction: input }))
+        .unwrap()
+        .then((updatedContent) => {
+          console.log('Cover letter improved:', updatedContent);
+        })
+        .catch((err) => {
+          console.error('Failed to improve cover letter:', err);
+        });
+
+      setInput('');
   };
+
   return (
       <div className="max-w-10xl mx-auto p-1">
         {/* Back Button */}

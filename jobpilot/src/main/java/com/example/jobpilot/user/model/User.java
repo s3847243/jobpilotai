@@ -39,7 +39,7 @@ public class User {
     private String fullName;
     private String jobTitle;
     private String location;
-
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;

@@ -1,31 +1,18 @@
 
 
-import React, { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useEffect } from 'react';
 import CoverLetterItem from './CoverLetterItem';
-import { fetchCoverLetters } from '../../api/CoverLetterApi';
-import { CoverLetters } from '../../types/CoverLetter';
-import { deleteCoverLetterById } from '../../api/CoverLetterApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import {fetchCoverLettersThunk } from '../../features/coverletter/coverLetterThunks';
 const CoverLetter = () => {
-  const [coverLetters, setCoverLetters] = useState<CoverLetters[]>([]);
+  // Access Redux state
+  const { coverLetters, loading, error } = useSelector((state: RootState) => state.coverLetters);
+  const dispatch = useDispatch<AppDispatch>();
+    useEffect(() => {
+    dispatch(fetchCoverLettersThunk());
+  }, [dispatch]);
 
-  useEffect(() => {
-    const load = async () => {
-      const result = await fetchCoverLetters();
-      setCoverLetters(result);
-    };
-    load();
-  }, []);
-    const handleDeleteCoverLetter= async (id: string) => {
-  
-      try {
-        await deleteCoverLetterById(id);
-        setCoverLetters((prev) => prev.filter((r) => r.id !== id));
-        console.log("Cover Letter deleted");
-      } catch (err) {
-        console.error("Failed to delete letter:", err);
-      }
-    };
   return (
     <section>
       <div className="flex items-center justify-between">
@@ -41,7 +28,7 @@ const CoverLetter = () => {
           <CoverLetterItem
             key={cl.id}
             id={cl.id}
-            onDelete={handleDeleteCoverLetter}
+
             jobId = {cl.jobId}
             title={cl.coverLetterName}
             date={cl.createdAt}

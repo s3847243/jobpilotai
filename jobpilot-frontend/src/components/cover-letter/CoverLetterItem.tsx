@@ -2,20 +2,31 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Edit3, MoreVertical, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../modal/ConfirmModal';
-
-const CoverLetterItem = ({ id, title, jobId, date,onDelete }: {
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store';
+import { deleteCoverLetterThunk } from '../../features/coverletter/coverLetterThunks';
+const CoverLetterItem = ({ id, title, jobId, date }: {
   id: string;
   title: string;
   jobId:string;
-
   date: string;
-  onDelete: (id: string) => void;
 }) => {
     const [menuOpen, setMenuOpen] = useState(false);
      const menuRef = useRef<HTMLDivElement>(null);
      const [showConfirm, setShowConfirm] = useState(false);
        const [loading, setLoading] = useState(false);
-  
+       const dispatch = useDispatch<AppDispatch>();
+
+    const handleDeleteCoverLetter = () => {
+      dispatch(deleteCoverLetterThunk(id))
+        .unwrap()
+        .then(() => {
+          console.log('Cover Letter deleted');
+        })
+        .catch((err) => {
+          console.error('Failed to delete letter:', err);
+        });
+    };
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -69,8 +80,8 @@ const CoverLetterItem = ({ id, title, jobId, date,onDelete }: {
       <ConfirmModal
         isOpen={showConfirm}
         title="Delete Letter"
-        message="Are you sure you want to delete this resume? This action cannot be undone."
-        onConfirm={() => onDelete(id)}
+        message="Are you sure you want to delete this cover letter? This action cannot be undone."
+        onConfirm={handleDeleteCoverLetter}
         onCancel={() => setShowConfirm(false)}
         loading={loading}
         confirmText="Delete"

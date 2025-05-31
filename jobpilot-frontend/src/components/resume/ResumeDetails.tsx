@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getResumeById } from '../../api/ResumeApi';
-import { Resume } from '../../types/Resume';
-import { getJobsByResumeId } from '../../api/ResumeApi';
-import { JobSummaryDTO } from '../../types/JobSummaryDTO';
+import { useParams, Link } from 'react-router-dom';
+import { AppDispatch,RootState } from '../../store';
+import { useDispatch,useSelector  } from 'react-redux';
+import { getResumeByIdThunk, getJobsByResumeIdThunk } from '../../features/resume/resumesThunk';
+
 import { 
   User, 
   Mail, 
@@ -16,7 +16,6 @@ import {
   Download,
   ExternalLink,
   Calendar,
-  MapPin,
   Star,
   TrendingUp,
   Target,
@@ -26,24 +25,41 @@ import {
   XCircle,
   ChevronRight
 } from 'lucide-react';
+
 const ResumeDetails: React.FC = () => {
   const { resumeId } = useParams<{ resumeId: string }>();
-  const [resume, setResume] = useState<Resume | null>(null);
-  const [jobs, setJobs] = useState<JobSummaryDTO[]>([]);
   const [activeSection, setActiveSection] = useState('overview');
   const [loading, setLoading] = useState(true);
-
-  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const resume = useSelector((state: RootState) =>
+    state.resumes.resumes.find((r) => r.id === resumeId)
+  );
+  const jobs = useSelector((state: RootState) => state.resumes.resumeJobs || []);
   useEffect(() => {
-    // Simulate loading
     setTimeout(() => setLoading(false), 1500);
   }, []);
-    useEffect(() => {
-    if (!resumeId) return;
-    getResumeById(resumeId).then(setResume);
 
-    getJobsByResumeId(resumeId).then(setJobs);
-  }, [resumeId]);
+  // useEffect(() => {
+  //   if (!resumeId) return;
+  //   getResumeById(resumeId).then(setResume);
+
+  //   getJobsByResumeId(resumeId).then(setJobs);
+  // }, [resumeId]);
+  useEffect(() => {
+    if (!resumeId) return;
+
+    setLoading(true);
+    Promise.all([
+      dispatch(getResumeByIdThunk(resumeId)).unwrap(),
+      dispatch(getJobsByResumeIdThunk(resumeId)).unwrap(),
+    ])
+      .then(() => setLoading(false))
+      .catch((err) => {
+        console.error('Failed to load resume details:', err);
+        setLoading(false);
+      });
+  }, [dispatch, resumeId]);
+
   const getStatusIcon = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'applied':
@@ -88,7 +104,6 @@ const ResumeDetails: React.FC = () => {
 
 
   if (!resume) return <div className="p-6 text-center text-gray-500 animate-pulse">Loading resume details...</div>;
-  console.log(resume);
   return (
     <div className="min-h-screen bg-white from-slate-50 to-blue-50">
 

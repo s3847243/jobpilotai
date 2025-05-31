@@ -1,60 +1,70 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import ResumeItem from './ResumeItem';
-import { fetchResumes } from '../../api/ResumeApi';
-import { Resume } from '../../types/Resume';
-import { uploadResume } from '../../api/ResumeApi';
-import { deleteResumeById } from '../../api/ResumeApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch,RootState } from '../../store';
+import { fetchResumesThunk, uploadResumeThunk } from '../../features/resume/resumesThunk'; // Adjust import path
+
 const ResumeApp = () => {
-  const [resumes, setResumes] = useState<Resume[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { resumes, loading, error } = useSelector((state: RootState) => state.resumes);
+
   useEffect(() => {
-    const loadResumes = async () => {
-      try {
-        const data = await fetchResumes();
-        setResumes(data);
-      } catch (err) {
-        console.error('Failed to fetch resumes:', err);
-      }
-    };
-    loadResumes();
-  }, []);
-   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(fetchResumesThunk());
+  }, [dispatch]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFile(e.target.files[0]);
     }
   };
-  const handleDeleteResume = async (id: string) => {
-   
+  // const handleDeleteResume = async (id: string) => {
+  //   try {
+  //     await deleteResumeById(id); // Assume you have this API
+  //     setResumes((prev) => prev.filter((r) => r.id !== id));
+  //     console.log("Resume deleted");
+  //   } catch (err) {
+  //     console.error("Failed to delete resume:", err);
+  //   }
+  // };
 
-    try {
-      await deleteResumeById(id); // Assume you have this API
-      setResumes((prev) => prev.filter((r) => r.id !== id));
-      console.log("Resume deleted");
-    } catch (err) {
-      console.error("Failed to delete resume:", err);
-    }
-  };
 
-  const handleUpload = async () => {
+  // const handleUpload = async () => {
+  //   if (!selectedFile) return;
+  //   setUploading(true);
+  //   try {
+  //     await uploadResume(selectedFile);
+  //     setModalOpen(false);
+  //     setSelectedFile(null);
+  //     // Refresh resumes list
+  //     const updatedResumes = await fetchResumes();
+  //     setResumes(updatedResumes);
+  //   } catch (err) {
+  //     console.error('Upload failed:', err);
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
+
+  const handleUpload = () => {
     if (!selectedFile) return;
     setUploading(true);
-    try {
-      await uploadResume(selectedFile);
-      setModalOpen(false);
-      setSelectedFile(null);
-      // Refresh resumes list
-      const updatedResumes = await fetchResumes();
-      setResumes(updatedResumes);
-    } catch (err) {
-      console.error('Upload failed:', err);
-    } finally {
-      setUploading(false);
-    }
+
+    dispatch(uploadResumeThunk(selectedFile))
+      .unwrap()
+      .then(() => {
+        console.log('Resume uploaded');
+        setModalOpen(false);
+        setSelectedFile(null);
+      })
+      .catch((err) => {
+        console.error('Upload failed:', err);
+      });
   };
- return (
+  return (
     <section>
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-mono px-10 py-2">My Resumes</h1>
@@ -74,7 +84,6 @@ const ResumeApp = () => {
           <ResumeItem
             key={resume.id}
             id={resume.id}
-            onDelete={handleDeleteResume}
             name={resume.filename}
             date={new Date(resume.uploadedAt).toLocaleDateString()}
           />

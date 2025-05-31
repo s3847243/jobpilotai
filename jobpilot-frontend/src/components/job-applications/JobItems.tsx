@@ -15,7 +15,7 @@ const JobItems:React.FC<Props> = ({ job}) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-
+  
   const selectOption = async (option: string) => {
     try {
       await dispatch(updateJobStatusThunk({ jobId: job.id, status: option }));

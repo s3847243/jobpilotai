@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { getResumeById } from '../../api/ResumeApi';
-import { Resume } from '../../types/Resume';
+import React, { useEffect} from 'react';
 import { AlertCircle, Calendar, FileText, Mail, User } from 'lucide-react';
+import { getResumeByIdThunk } from '../../features/resume/resumesThunk';
+import { AppDispatch,RootState } from '../../store';
+import { useDispatch,useSelector } from 'react-redux';
 interface ResumeOverviewCardProps {
   resumeId: string;
 }
 
 const ResumeOverviewCard: React.FC<ResumeOverviewCardProps> = ({ resumeId }) => {
-  const [resume, setResume] = useState<Resume >();
-  const [loading, setLoading] = useState(true);
 
+  const dispatch = useDispatch<AppDispatch>();
+  const resume = useSelector((state: RootState) =>
+    state.resumes.resumes.find((r) => r.id === resumeId)
+  );
+  const loading = useSelector((state: RootState) => state.resumes.loading);
+  const error = useSelector((state: RootState) => state.resumes.error);
   useEffect(() => {
-    const fetchResume = async () => {
-      try {
-        const data = await getResumeById(resumeId);
-        setResume(data);
-      } catch (err) {
-        console.error('Failed to load resume', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResume();
-  }, [resumeId]);
+    if (!resumeId) return;
+    dispatch(getResumeByIdThunk(resumeId)).unwrap().catch(console.error);
+  }, [dispatch, resumeId]);
 
   if (loading) {
     return (
