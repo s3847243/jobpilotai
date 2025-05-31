@@ -3,7 +3,9 @@ import { MoreVertical, ChevronLast, ChevronFirst, BarChart3, User } from "lucide
 type SidebarContextType = {
     expanded: boolean;
 };
-  
+import { RootState } from '../../store';
+import { useSelector } from 'react-redux';
+
 export const SidebarContext = createContext<SidebarContextType | null>(null);
   
 type SidebarProps = {
@@ -11,6 +13,8 @@ type SidebarProps = {
 };
 const Sidebar = ({ children }: SidebarProps) => {
     const [expanded,setExpanded] = useState(true);
+      const user = useSelector((state: RootState) => state.users); // Assuming your slice name is "users"
+
 return (
     <aside className={`
       transition-all duration-300 ease-in-out bg-white
@@ -76,10 +80,10 @@ return (
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <h4 className="text-sm font-semibold text-gray-900 truncate">
-                    John Doe
+                   {user.name || 'Guest User'}
                   </h4>
                   <p className="text-xs text-gray-500 truncate">
-                    john.doe@example.com
+                    {user.email || 'Not logged in'}
                   </p>
                 </div>
                 <button className="p-1 rounded-md hover:bg-gray-100 transition-colors">

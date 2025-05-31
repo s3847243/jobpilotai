@@ -9,7 +9,6 @@ import { fetchJobByIdThunk, matchJobThunk, assignResumeThunk } from '../../featu
 
 const ResumePage = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  // const [job, setJob] = useState<Job | null>(null); 
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const navigate = useNavigate();
     const job = useSelector((state: RootState) =>
