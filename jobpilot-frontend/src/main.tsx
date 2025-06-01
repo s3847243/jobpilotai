@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import {Provider } from 'react-redux'
 import { store } from './store.ts'
+import ThemeWrapper from './components/theme/ThemeWrapper.tsx'
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
@@ -11,7 +12,9 @@ if (rootElement) {
 
   <StrictMode>
     <Provider store={store}>
-    <App />
+    <ThemeWrapper>
+      <App />
+    </ThemeWrapper>
     </Provider>
   </StrictMode>,
 )

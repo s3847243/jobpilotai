@@ -53,31 +53,32 @@ const ResumePage = () => {
       });
   };
 
-  return (
-    <div className="max-w-6xl mx-auto p-6 flex flex-col gap-8">
-      
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md shadow-sm transition"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L7 10.414a1 1 0 010-1.414L11.293 4.293a1 1 0 111.414 1.414L9.414 9l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Back
-        </button>
-      </div>
-      <ResumeOverviewCard resumeId={job.resumeId || ''} />
-      <ResumeFeedbackSection
-        feedback={job.matchFeedback || ""}
-
-        onReplace={handleReplace}
-        matchScore={Number(job.matchScore) || 0}
-        missingSkills={job.missingSkills || []}
-      />
-
+return (
+  <div className="max-w-6xl mx-auto p-6 flex flex-col gap-8 text-gray-800 dark:text-gray-100">
+    
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1 rounded-md shadow-sm transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L7 10.414a1 1 0 010-1.414L11.293 4.293a1 1 0 111.414 1.414L9.414 9l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+        </svg>
+        Back
+      </button>
     </div>
-  );
+
+    <ResumeOverviewCard resumeId={job.resumeId || ''} />
+
+    <ResumeFeedbackSection
+      feedback={job.matchFeedback || ""}
+      onReplace={handleReplace}
+      matchScore={Number(job.matchScore) || 0}
+      missingSkills={job.missingSkills || []}
+    />
+
+  </div>
+);
 };
 
 export default ResumePage;

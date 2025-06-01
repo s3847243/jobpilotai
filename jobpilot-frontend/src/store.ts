@@ -4,15 +4,15 @@ import resumeReducer from './features/resume/resumeSlice';
 import coverLetterReducer from './features/coverletter/coverLetterSlice';
 import followUpsReducer from './features/followup/followUpSlice';
 import userReducer from './features/user/userSlice';
+import themeReducer from './features/theme/themeSlice';
 export const store = configureStore({
   reducer: {
     jobs: jobsReducer,
     coverLetters: coverLetterReducer,
     resumes: resumeReducer,
     followUps: followUpsReducer,
-    users:userReducer
-
-
+    users:userReducer,
+    theme: themeReducer
   },
 });
 
