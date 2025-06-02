@@ -1,33 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import  { useEffect } from 'react';
 import FollowUpItem from './FollowUpItem';
-import { getAllFollowUpsForUser } from '../../api/FollowUpEmailApi';
-import { FollowUpEmail } from '../../types/FollowUpEmail';
-import { deleteFollowUpEmailById } from '../../api/FollowUpEmailApi';
+
+import { useDispatch,useSelector } from 'react-redux';
+import { AppDispatch,RootState } from '../../store';
+import {fetchAllFollowUpsThunk } from '../../features/followup/followUpThunk';
 const FollowUpAll = () => {
-  const [emails, setEmails] = useState<FollowUpEmail[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { followUps } = useSelector((state: RootState) => state.followUps);
 
   useEffect(() => {
-    const loadResumes = async () => {
-      try {
-        const data = await getAllFollowUpsForUser();
-        setEmails(data);
-      } catch (err) {
-        console.error('Failed to fetch emails:', err);
-      }
-    };
-    loadResumes();
-  }, []);
-  const handleDeleteFollowUp= async (id: string) => {
+    dispatch(fetchAllFollowUpsThunk());
+  }, [dispatch]);
 
-    try {
-      await deleteFollowUpEmailById(id);
-      setEmails((prev) => prev.filter((r) => r.id !== id));
-      console.log("Email deleted");
-    } catch (err) {
-      console.error("Failed to delete email:", err);
-    }
-  };
+
 return (
   <section className="min-h-screen bg-white dark:bg-slate-900">
     <div className="flex items-center justify-between">
@@ -37,11 +22,11 @@ return (
     <hr className="my-3 border-t-4 py-3 border-gray-300 dark:border-gray-600" />
 
     <div className="grid grid-cols-4 gap-6 px-5">
-      {emails.map((email) => (
+      {followUps.map((email) => (
         <FollowUpItem
           key={email.id}
           id={email.id}
-          onDelete={handleDeleteFollowUp}
+
           name={email.followUpEmailName}
           jobId={email.jobId}
           date={new Date(email.createdAt).toLocaleDateString()}

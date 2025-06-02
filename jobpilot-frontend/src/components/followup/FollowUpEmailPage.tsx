@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {
-  getFollowUpByFollowUpId,
-  generateFollowUpEmail,
-  improveFollowUpEmail,
-} from '../../api/FollowUpEmailApi';
+
 import { FollowUpEmail } from '../../types/FollowUpEmail';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getJobById } from '../../api/JobApi';
 import { downloadAsPdf } from './DownloadAsPdf';
+import { useDispatch,useSelector } from 'react-redux';
+import { AppDispatch,RootState } from '../../store';
+import {
+  getFollowUpByIdThunk,
+  generateFollowUpThunk,
+  improveFollowUpThunk
+} from '../../features/followup/followUpThunk';
+import { fetchJobByIdThunk } from '../../features/jobs/jobsThunk';
 interface ChatMessage {
   id: number;
   text: string;
@@ -16,67 +20,84 @@ interface ChatMessage {
 
 const FollowUpEmailPage: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
+  const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState<FollowUpEmail | null>(null);
   const [loading, setLoading] = useState(false);
   const [improving, setImproving] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [input, setInput] = useState('');
+  const [input, setInput] = useState('');
   const navigate = useNavigate();
-
-    const [nextId, setNextId] = useState(0);
+  const [nextId, setNextId] = useState(0);
+  const { followUps, error } = useSelector((state: RootState) => state.followUps);
   useEffect(() => {
-    if (jobId) fetchFollowUp();
-  }, [jobId]);
+    if (jobId) {
+      fetchFollowUp();
+    }
+  }, [jobId, followUps]);
 
 const fetchFollowUp = async () => {
+  if (!jobId) return;
   try {
-    // Step 1: Fetch the job to check if follow-up exists
-    const job = await getJobById(jobId!);
-
-    if (job.followUpEmailId) {
-      // Step 2: Now fetch the actual follow-up email using the ID
-      const data = await getFollowUpByFollowUpId(job.followUpEmailId);
-      setEmail(data);
+    const result = await dispatch(fetchJobByIdThunk(jobId));
+    if (fetchJobByIdThunk.fulfilled.match(result)) {
+      const job = result.payload;
+      if (job.followUpEmailId) {
+        const followUpResult = await dispatch(getFollowUpByIdThunk(job.followUpEmailId));
+        if (getFollowUpByIdThunk.fulfilled.match(followUpResult)) {
+          setEmail(followUpResult.payload);
+        } else {
+          setEmail(null);
+        }
+      } else {
+        setEmail(null);
+      }
     } else {
-      setEmail(null);
+      console.error('Failed to fetch job:', result.payload);
     }
-  } catch {
+  } catch (err) {
+    console.error('Error:', err);
     setEmail(null);
   }
 };
 
   const handleGenerate = async () => {
-    setLoading(true);
+    if (!jobId) return;
     try {
-      const data = await generateFollowUpEmail(jobId!);
-      setEmail(data);
-    } finally {
-      setLoading(false);
+      const result = await dispatch(generateFollowUpThunk(jobId));
+      if (generateFollowUpThunk.fulfilled.match(result)) {
+        setEmail(result.payload);
+      }
+    } catch (err) {
+      console.error('Error generating follow-up:', err);
     }
   };
 
   const handleImprove = async () => {
-
     if (!input.trim() || !email) return;
     setImproving(true);
     try {
-    const id = nextId;
-    setNextId(prev => prev + 1);
+      const id = nextId;
+      setNextId(prev => prev + 1);
 
-    // Add message with animation disabled
-    setMessages(prev => [...prev, { id, text: input, animate: false }]);
+      setMessages(prev => [...prev, { id, text: input, animate: false }]);
+      setTimeout(() => {
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === id ? { ...msg, animate: true } : msg
+          )
+        );
+      }, 10);
 
-    // Activate animation in next tick
-    setTimeout(() => {
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === id ? { ...msg, animate: true } : msg
-        )
+      const result = await dispatch(
+        improveFollowUpThunk({ followUpId: email.id, instructions: input })
       );
-    }, 10); // minimal delay to trigger transition
-      const updated = await improveFollowUpEmail(email.id, input);
-      setInput('');
-      setEmail(updated);
+
+      if (improveFollowUpThunk.fulfilled.match(result)) {
+        setEmail(result.payload);
+        setInput('');
+      }
+    } catch (err) {
+      console.error('Error improving follow-up:', err);
     } finally {
       setImproving(false);
     }

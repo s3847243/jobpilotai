@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Edit3, Trash2, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../modal/ConfirmModal';
-import { AppDispatch,RootState } from '../../store';
+import { AppDispatch } from '../../store';
 import { useDispatch } from 'react-redux';
 import { deleteResumeByIdThunk } from '../../features/resume/resumesThunk';
 
@@ -32,7 +32,7 @@ const ResumeItem = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-    const handleDeleteResume = () => {
+  const handleDeleteResume = () => {
     dispatch(deleteResumeByIdThunk(id))
       .unwrap()
       .then(() => console.log('Resume deleted'))

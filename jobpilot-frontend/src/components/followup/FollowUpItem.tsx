@@ -2,13 +2,16 @@ import { Edit3, MoreVertical, Trash2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ConfirmModal from '../modal/ConfirmModal';
-
-const FollowUpItem = ({ id, name, jobId,date,  onDelete }: { 
+import { AppDispatch } from '../../store';
+import { useDispatch } from 'react-redux';
+import { deleteFollowUpThunk } from '../../features/followup/followUpThunk';
+const FollowUpItem = ({ id, name, jobId,date }: { 
     id: string; 
     name: string; 
     jobId:string;
     date: string ;
-    onDelete: (id: string) => void;}) => 
+  }
+  ) => 
   {
   
    const [menuOpen, setMenuOpen] = useState(false);
@@ -16,7 +19,7 @@ const FollowUpItem = ({ id, name, jobId,date,  onDelete }: {
      const [showConfirm, setShowConfirm] = useState(false);
        const [loading, setLoading] = useState(false);
    
-  
+   const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -26,7 +29,12 @@ const FollowUpItem = ({ id, name, jobId,date,  onDelete }: {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-  
+    const handleDeleteFollowUp = () => {
+      dispatch(deleteFollowUpThunk(id))
+        .unwrap()
+        .then(() => console.log('Email deleted'))
+        .catch((err) => console.error('Failed to delete Email:', err));
+    };
   return (
   <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md flex flex-col gap-4 w-full max-w-sm border border-gray-200 dark:border-gray-700">
     <div className="flex items-start justify-between">
@@ -75,7 +83,7 @@ const FollowUpItem = ({ id, name, jobId,date,  onDelete }: {
       isOpen={showConfirm}
       title="Delete Email"
       message="Are you sure you want to delete this resume? This action cannot be undone."
-      onConfirm={() => onDelete(id)}
+      onConfirm={handleDeleteFollowUp}
       onCancel={() => setShowConfirm(false)}
       loading={loading}
       confirmText="Delete"
