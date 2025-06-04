@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jobpilot.job.dto.JobDTO;
-import com.example.jobpilot.job.dto.ManualJobRequest;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.service.JobService;
@@ -93,11 +92,6 @@ public class JobController {
         return ResponseEntity.ok(updatedJob);
     }
 
-    @PostMapping("/manual")
-    public ResponseEntity<JobDTO> addManualJob(@RequestBody ManualJobRequest request, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        JobDTO job = jobService.addManualJob(request, userPrincipal.getUser());
-        return ResponseEntity.ok(job);
-    }
     
     @PutMapping("/{jobId}/resume")
     public ResponseEntity<JobDTO> replaceResumeForJob(

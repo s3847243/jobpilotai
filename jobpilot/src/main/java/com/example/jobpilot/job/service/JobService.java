@@ -109,24 +109,22 @@ public class JobService {
     
     public JobDTO  matchJobWithResume(Job job, Resume resume) {
         String feedback = openAiMatchSummary(job, resume);
-        Double score = extractScore(feedback); 
-    
+        Double score = extractScore(feedback);     
         job.setMatchScore(score);
         job.setMatchFeedback(feedback);
         job.setMissingSkills(new ArrayList<>(extractMissingSkills(feedback)));
 
-    
         return jobMapper.toDTO(jobRepository.save(job));
     }
     public Job getJobEntityById(UUID jobId, User user) {
-    Job job = jobRepository.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
 
-    if (!job.getUser().getUserId().equals(user.getUserId())) {
-        throw new RuntimeException("Unauthorized");
-    }
+        if (!job.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Unauthorized");
+        }
 
-    return job;
+        return job;
     }
     public List<JobDTO> getUserJobs(User user) {
         return jobRepository.findByUser(user).stream()
@@ -143,7 +141,6 @@ public class JobService {
 
         return jobMapper.toDTO(job);
     }
-
     public JobDTO  updateJobStatus(UUID jobId, String status, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -161,24 +158,6 @@ public class JobService {
     
         return jobMapper.toDTO(jobRepository.save(job));
     }
-
-    public JobDTO  addManualJob(ManualJobRequest request, User user) {
-    Job job = Job.builder()
-            .user(user)
-            .title(request.getTitle())
-            .company(request.getCompany())
-            .location(request.getLocation())
-            .employmentType(request.getEmploymentType())
-            .description(request.getDescription())
-            .source("Manual")
-            .status(JobStatus.SAVED) 
-            .createdAt(Instant.now())
-            .build();
-
-    return jobMapper.toDTO(jobRepository.save(job));
-    }   
-
-
     public JobDTO  replaceResume(UUID jobId, Resume newResume, User user) {
         Job job = jobRepository.findById(jobId)
             .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -199,7 +178,6 @@ public class JobService {
     }
     @Transactional
     public JobDTO  assignResume(UUID jobId, UUID resumeId, User user) {
-        System.out.println("it is getting here");
 
         Job job = jobRepository.findById(jobId)
             .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -214,7 +192,7 @@ public class JobService {
         job.setMatchScore(null);
         job.setMatchFeedback(null);
         job.setMissingSkills(null);
-        // 🔥 Invalidate old cover letter
+        // Invalidate old cover letter
         CoverLetter existingCoverLetter = job.getCoverLetter();
         if (existingCoverLetter != null) {
             String coverLetterText = openAiService.generateCoverLetter(
@@ -242,5 +220,7 @@ public class JobService {
 
         jobRepository.delete(job);
     }
+
+    
     
 }

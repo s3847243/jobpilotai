@@ -47,7 +47,7 @@ public class FollowUpEmailService {
 
         FollowUpEmail saved = followUpEmailRepository.save(email);
         job.setFollowUpEmail(saved);
-        jobRepository.save(job); // Optional if cascade is set
+        jobRepository.save(job); 
 
         return followUpEmailMapper.toDTO(saved);
     }
@@ -105,4 +105,5 @@ public class FollowUpEmailService {
 
         followUpEmailRepository.delete(followUpEmail);
     }
+    
 }

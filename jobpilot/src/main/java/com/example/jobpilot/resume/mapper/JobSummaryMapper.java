@@ -7,13 +7,13 @@ import com.example.jobpilot.resume.dto.JobSummaryDTO;
 @Component
 public class JobSummaryMapper {
     public JobSummaryDTO toSummaryDTO(Job job) {
-        JobSummaryDTO dto = new JobSummaryDTO();
-        dto.setId(job.getId());
-        dto.setTitle(job.getTitle());
-        dto.setCompany(job.getCompany());
-        dto.setMatchScore(job.getMatchScore());
-        dto.setStatus(job.getStatus().toString());
-        dto.setUrl(job.getUrl());
-        return dto;
+        return JobSummaryDTO.builder()
+            .id(job.getId())
+            .title(job.getTitle())
+            .company(job.getCompany())
+            .matchScore(job.getMatchScore())
+            .status(job.getStatus().toString())
+            .url(job.getUrl())
+            .build();
     }
 }
