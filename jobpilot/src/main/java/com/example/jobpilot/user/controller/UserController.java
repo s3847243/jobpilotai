@@ -25,12 +25,12 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        UserDTO user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(user);
-    }
+    // @GetMapping("/me")
+    // public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
+    //     String email = authentication.getName();
+    //     UserDTO user = userService.getUserByEmail(email);
+    //     return ResponseEntity.ok(user);
+    // }
 
     @PatchMapping("/profile")
     public ResponseEntity<UserDTO> updateProfile(

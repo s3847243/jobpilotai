@@ -4,9 +4,12 @@ import com.example.jobpilot.user.dto.UserDTO;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+
 public class AuthResponse {
     private String accessToken;
     private String refreshToken;
