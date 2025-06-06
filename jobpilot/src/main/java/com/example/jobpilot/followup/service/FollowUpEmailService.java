@@ -34,8 +34,8 @@ public class FollowUpEmailService {
             throw new RuntimeException("Follow-up email already exists for this job");
         }
 
-        String prompt = buildFollowUpPrompt(job);
-        String content = openAiService.getRawResponse(prompt);
+        String content = openAiService.generateFollowUpEmailPrompt(job);
+
 
         FollowUpEmail email = new FollowUpEmail();
         email.setJob(job);
@@ -72,8 +72,7 @@ public class FollowUpEmailService {
             throw new IllegalArgumentException("Improvement instructions cannot be empty");
         }
 
-        String prompt = buildImprovementPrompt(email, instructions);
-        String improvedBody = openAiService.getRawResponse(prompt);
+        String improvedBody = openAiService.buildImprovementPrompt(email, instructions);
 
         email.setBody(improvedBody);
         FollowUpEmail updated = followUpEmailRepository.save(email);
@@ -81,19 +80,7 @@ public class FollowUpEmailService {
         return followUpEmailMapper.toDTO(updated);
     }
 
-    private String buildFollowUpPrompt(Job job) {
-        return String.format("""
-            Write a polite and professional follow-up email for the position of %s at %s. 
-            The applicant has already submitted an application and wants to express continued interest and inquire about the next steps.
-        """, job.getTitle(), job.getCompany());
-    }
-
-    private String buildImprovementPrompt(FollowUpEmail email, String userInstructions) {
-        return String.format("""
-            The user has written this follow-up email:\n\n%s\n\n
-            Please improve or modify it based on the following instructions:\n%s
-        """, email.getBody(), userInstructions);
-    }
+   
 
     public void deleteFollowUpEmail(UUID followUpEmailId, User user) {
         FollowUpEmail followUpEmail = followUpEmailRepository.findById(followUpEmailId)

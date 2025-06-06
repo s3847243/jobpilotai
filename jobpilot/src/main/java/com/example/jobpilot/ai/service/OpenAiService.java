@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.jobpilot.followup.model.FollowUpEmail;
+import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.resume.dto.ParsedResumeDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,7 +63,6 @@ public class OpenAiService {
         return (String) message.get("content");
     }
 
-    // 1️⃣ Used in Resume-Job Matching (match score + feedback + missing skills)
     public String getMatchExplanation(String resumeSummary, String jobDescription) {
         String prompt = String.format("""
             You are a job recruiter AI. Analyze the following:
@@ -86,7 +87,6 @@ public class OpenAiService {
         return getRawResponse(prompt);
     }
 
-    // 2️⃣ Used to Extract Job Details (real scraping from pasted job text)
     public String extractJobInfoFromText(String pageText) {
         String prompt = String.format("""
             Extract the following fields as a JSON object:
@@ -104,7 +104,6 @@ public class OpenAiService {
         return getRawResponse(prompt);
     }
 
-    // 3️⃣ Used to Generate Personalized Cover Letters
     public String generateCoverLetter(String resumeSummary, String jobTitle, String companyName, String jobDescription) {
         String prompt = String.format("""
             You are an expert career coach and recruiter.
@@ -132,7 +131,16 @@ public class OpenAiService {
     }
     public ParsedResumeDTO extractResumeInfo(String resumeText) {
     String prompt = """
-    Extract the following details from the resume text below. Return the response as a **single JSON object** with the following fields:
+    Extract the following details from the resume text below. Return the response as a **single JSON object** with the structure below. 
+
+    The `summary` field must be rich and detailed. It should include:
+    - All significant work experiences and roles
+    - Key impacts and accomplishments (with quantifiable results where possible)
+    - Technologies and tools used
+    - Major projects or responsibilities
+    - Certifications or standout education achievements
+
+    Use a professional tone and keep the summary informative and ATS-friendly.
 
     {
     "name": "string",              // Candidate's full name
@@ -140,7 +148,7 @@ public class OpenAiService {
     "phone": "string",             // Phone number
     "skills": ["...", "..."],      // Key technical and soft skills
     "atsScore": number,            // A number (0-100) representing how well this resume matches a typical job description
-    "summary": "string"            // A **concise overall summary** of the candidate's skills, experience, and impact (approx 3-4 sentences)
+    "summary": "string"            // A detailed, ATS-friendly summary that includes key experience, technologies, impacts, and accomplishments
     }
 
     Resume Text:
@@ -176,4 +184,34 @@ public class OpenAiService {
     
         return getRawResponse(prompt);
     }
+
+    public String generateFollowUpEmailPrompt(Job job) {
+        String prompt = String.format("""
+            Write a polite and professional follow-up email for the position of %s at %s.
+
+            The applicant has already submitted an application and wants to express continued interest and inquire about the next steps.
+
+            Only return the email body. Do not include any extra commentary, greetings, closing remarks, or instructions. Just the email itself.
+        """, job.getTitle(), job.getCompany());
+
+        return getRawResponse(prompt);
+    }
+
+
+    public String buildImprovementPrompt(FollowUpEmail email, String userInstructions) {
+        String prompt = String.format("""
+            The user has written the following follow-up email:
+
+            %s
+
+            Improve or modify this email based on the following instructions:
+
+            %s
+
+            Only return the improved email body. Do not include any explanations, notes, or extra text—just the revised email itself.
+        """, email.getBody(), userInstructions);
+
+        return getRawResponse(prompt);
+    }
+
 }
