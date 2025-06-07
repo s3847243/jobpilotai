@@ -19,7 +19,7 @@ export const fetchAllFollowUpsThunk = createAsyncThunk<FollowUpEmail[]>(
   }
 );
 
-export const getFollowUpByIdThunk = createAsyncThunk<FollowUpEmail, string>(
+export const getFollowUpByIdThunk = createAsyncThunk<FollowUpEmail, string,{ rejectValue: string }>(
   'followUp/getById',
   async (followUpId, { rejectWithValue }) => {
     try {
@@ -30,7 +30,7 @@ export const getFollowUpByIdThunk = createAsyncThunk<FollowUpEmail, string>(
   }
 );
 
-export const generateFollowUpThunk = createAsyncThunk<FollowUpEmail, string>(
+export const generateFollowUpThunk = createAsyncThunk<FollowUpEmail, string,{ rejectValue: string }>(
   'followUp/generate',
   async (jobId, { rejectWithValue }) => {
     try {

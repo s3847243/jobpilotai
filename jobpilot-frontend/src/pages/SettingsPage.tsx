@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store'
 import { updateUserThunk, logoutUserThunk, deleteAccountThunk } from '../features/user/userThunk';
-import { Switch } from '@headlessui/react'; // Optional: HeadlessUI for toggle
-import { Moon, Sun, LogOut, Trash2, Bell, MapPin, Palette, Phone, Shield, User } from 'lucide-react';
+import { Moon, Sun, LogOut, Trash2, MapPin, Palette, Shield, User ,Workflow} from 'lucide-react';
 import { toggleTheme } from '../features/theme/themeSlice';
 const SettingsPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,17 +12,17 @@ const SettingsPage = () => {
     dispatch(toggleTheme());
     };
   const [name, setName] = useState(user.fullName || '');
-  const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('');
+  const [jobTitle, setJobTitle] = useState(user.jobTitle || '');
+  const [location, setLocation] = useState(user.location||'');
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleUpdateProfile = () => {
     setLoading(true);
-    dispatch(updateUserThunk({ name, phone, location }))
+    dispatch(updateUserThunk({ name,location, jobTitle }))
       .unwrap()
-      .then(() => alert('Profile updated!'))
-      .catch((err) => alert('Update failed: ' + err))
+      .then(() => console.log('Profile updated!'))
+      .catch((err) => console.log('Update failed: ' + err))
       .finally(() => setLoading(false));
   };
 
@@ -68,7 +67,7 @@ const SettingsPage = () => {
               {/* Inputs */}
               {[
                 { icon: <User size={18} />, value: name, setValue: setName, placeholder: "Full Name" },
-                { icon: <Phone size={18} />, value: phone, setValue: setPhone, placeholder: "Phone Number" },
+                { icon: <Workflow size={18} />, value: jobTitle, setValue: setJobTitle, placeholder: "Job Title" },
                 { icon: <MapPin size={18} />, value: location, setValue: setLocation, placeholder: "Location/City" }
               ].map((field, index) => (
                 <div key={index} className="relative group">
@@ -123,7 +122,7 @@ const SettingsPage = () => {
                   <div>
                     <span className="font-medium text-gray-800 dark:text-white">Theme</span>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {darkMode ? 'Dark' : 'Light'} mode
+                      {localStorage.getItem('theme') =='dark' ? 'Dark' : 'Light'} mode
                     </p>
                   </div>
                 </div>

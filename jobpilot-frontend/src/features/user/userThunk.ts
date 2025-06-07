@@ -30,7 +30,6 @@ export const updateUserThunk = createAsyncThunk('user/update', async (data: {
   name?: string;
   location?: string;
   jobTitle?: string;
-  phone?: string;
 }, { rejectWithValue }) => {
   try {
     return await updateUserProfile(data);

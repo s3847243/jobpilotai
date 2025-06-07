@@ -7,6 +7,8 @@ interface UserState {
   id: string | null;
   fullName: string | null;
   email: string | null;
+  jobTitle: string | null;
+  location:string |null;
   loading: boolean;
   error: string | null;
 }
@@ -15,6 +17,8 @@ const initialState: UserState = {
   id: null,
   fullName: null,
   email: null,
+  jobTitle: null,
+  location:null,
   loading: false,
   error: null,
 };
@@ -35,6 +39,9 @@ const userSlice = createSlice({
         state.id = action.payload.id;
         state.fullName = action.payload.fullName;
         state.email = action.payload.email;
+        state.jobTitle = action.payload.jobTitle;
+        state.location = action.payload.location;
+
         state.error = null;
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
@@ -68,6 +75,8 @@ const userSlice = createSlice({
         state.loading = false;
         state.fullName = action.payload.fullName ?? state.fullName;
         state.email = action.payload.email ?? state.email;
+        state.jobTitle = action.payload.jobTitle ?? state.jobTitle;
+        state.location = action.payload.location ?? state.location;
         state.error = null;
       })
       .addCase(updateUserThunk.rejected, (state, action) => {

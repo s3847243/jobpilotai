@@ -6,6 +6,7 @@ import { fetchCoverLettersThunk, generateCoverLetterThunk, deleteCoverLetterThun
 interface CoverLetterState {
   coverLetters: CoverLetterResponse[];
   selectedCoverLetter: CoverLetterResponse | null;
+  coverLettersByJobId: Record<string, CoverLetterResponse> ;
   improvedText: string | null;
   loading: boolean;
   error: string | null;
@@ -14,6 +15,7 @@ interface CoverLetterState {
 const initialState: CoverLetterState = {
   coverLetters: [],
   selectedCoverLetter: null,
+  coverLettersByJobId: {},
   improvedText: null,
   loading: false,
   error: null,
@@ -47,7 +49,10 @@ const coverLetterSlice = createSlice({
       })
       .addCase(getCoverLetterByIdThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedCoverLetter = action.payload;
+        const coverLetter = action.payload;
+        if (coverLetter && coverLetter.jobId) {
+          state.coverLettersByJobId[coverLetter.jobId] = coverLetter;
+        }
       })
       .addCase(getCoverLetterByIdThunk.rejected, (state, action) => {
         state.loading = false;
@@ -61,7 +66,11 @@ const coverLetterSlice = createSlice({
       })
       .addCase(generateCoverLetterThunk.fulfilled, (state, action) => {
         state.loading = false;
+        const coverLetter = action.payload;
         state.coverLetters.push(action.payload);
+        if (coverLetter && coverLetter.jobId) {
+          state.coverLettersByJobId[coverLetter.jobId] = coverLetter;
+        }
       })
       .addCase(generateCoverLetterThunk.rejected, (state, action) => {
         state.loading = false;
@@ -77,6 +86,10 @@ const coverLetterSlice = createSlice({
         state.loading = false;
         if (state.selectedCoverLetter) {
           state.selectedCoverLetter.content = action.payload;
+          const jobId = state.selectedCoverLetter.jobId;
+          if (jobId && state.coverLettersByJobId[jobId]) {
+            state.coverLettersByJobId[jobId].content = action.payload;
+          }
         }
       })
       .addCase(improveCoverLetterThunk.rejected, (state, action) => {

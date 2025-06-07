@@ -16,12 +16,15 @@ const CoverLetterPage = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [nextId, setNextId] = useState(0);
+  const[loadingText, setLoadingText] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const job = useSelector((state: RootState) =>
     state.jobs.jobs.find(j => j.id === jobId)
   );
-  const coverLetter = useSelector((state: RootState) => state.coverLetters.selectedCoverLetter?.content);
+  const coverLetter = useSelector((state: RootState) =>
+    jobId ? state.coverLetters.coverLettersByJobId[jobId]?.content : null
+  );
   const loading = useSelector((state: RootState) => state.coverLetters.loading);
 
  useEffect(() => {
@@ -45,15 +48,19 @@ const CoverLetterPage = () => {
         alert('No resume found for this job.');
         return;
       }
+      setLoadingText('Generating cover letter...');
+
 
       dispatch(generateCoverLetterThunk({ jobId: job.id, resumeId: job.resumeId }))
         .unwrap()
         .then(() => {
-          console.log('Cover letter generated!');
+        console.log('Cover letter generated successfully');
         })
         .catch((err) => {
           console.error('Failed to generate cover letter:', err);
-        });
+        })
+        .finally(() => setLoadingText(''));
+        
   };
 
   const handleImprove = () => {
@@ -62,10 +69,8 @@ const CoverLetterPage = () => {
       const id = nextId;
       setNextId(prev => prev + 1);
 
-      // Add message with animation disabled
       setMessages(prev => [...prev, { id, text: input, animate: false }]);
 
-      // Activate animation in next tick
       setTimeout(() => {
         setMessages(prev =>
           prev.map(msg =>
@@ -161,7 +166,15 @@ const CoverLetterPage = () => {
         </div>
 
         {/* Letter Preview Box */}
-        {coverLetter ? (
+        {loadingText ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+            <svg className="animate-spin h-5 w-5 mr-3 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p className="mt-2">{loadingText}</p>
+          </div>
+        ) : coverLetter ? (
           <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md overflow-y-auto h-full border border-gray-200 dark:border-slate-700">
             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed text-sm">
               {coverLetter}

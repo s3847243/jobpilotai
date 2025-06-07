@@ -24,7 +24,7 @@ export const generateCoverLetter = async (jobId: string, resumeId: string) => {
   );
   console.log(res.data);
 
-  return res.data; // returns { id, text, ... }
+  return res.data; 
 };
 
 export const improveCoverLetter = async (

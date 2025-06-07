@@ -6,6 +6,7 @@ import { FollowUpEmail } from '../../types/FollowUpEmail';
 interface FollowUpState {
   followUps: FollowUpEmail[];
   currentFollowUp: FollowUpEmail | null;
+  followUpsByJobId: Record<string, FollowUpEmail> ;
   loading: boolean;
   error: string | null;
 }
@@ -13,6 +14,7 @@ interface FollowUpState {
 const initialState: FollowUpState = {
   followUps: [],
   currentFollowUp: null,
+  followUpsByJobId:{},
   loading: false,
   error: null,
 };
@@ -37,14 +39,39 @@ const followUpSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Get By ID
+      // Get by ID
+      .addCase(getFollowUpByIdThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getFollowUpByIdThunk.fulfilled, (state, action) => {
-        state.currentFollowUp = action.payload;
+        state.loading = false;
+        const followUp = action.payload;
+        if (followUp && followUp.jobId) {
+          state.followUpsByJobId[followUp.jobId] = followUp;
+        }
+      })
+      .addCase(getFollowUpByIdThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to get cover letter';
       })
 
       // Generate
+      .addCase(generateFollowUpThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(generateFollowUpThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        const followUp = action.payload;
         state.followUps.push(action.payload);
+        if (followUp && followUp.jobId) {
+          state.followUpsByJobId[followUp.jobId] = followUp;
+        }
+      })
+      .addCase(generateFollowUpThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to generate cover letter';
       })
 
       // Improve

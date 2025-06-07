@@ -1,5 +1,5 @@
 import { createContext, useState,ReactNode } from 'react'
-import { MoreVertical, ChevronLast, ChevronFirst, BarChart3, User } from "lucide-react"
+import {  ChevronLast, ChevronFirst, BarChart3, User } from "lucide-react"
 type SidebarContextType = {
     expanded: boolean;
 };
@@ -13,8 +13,7 @@ type SidebarProps = {
 };
 const Sidebar = ({ children }: SidebarProps) => {
     const [expanded,setExpanded] = useState(true);
-      const user = useSelector((state: RootState) => state.users); // Assuming your slice name is "users"
-      console.log(user);
+      const user = useSelector((state: RootState) => state.users); 
 return (
   <aside className={`
     transition-all duration-300 ease-in-out
@@ -89,9 +88,7 @@ return (
                   {user.email || 'Not logged in'}
                 </p>
               </div>
-              <button className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <MoreVertical size={16} className="text-gray-400 dark:text-gray-300" />
-              </button>
+
             </div>
           </div>
         </div>
