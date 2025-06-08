@@ -33,3 +33,10 @@ export const deleteAccount = async () => {
   const response = await axiosInstance.delete('/user/delete', { withCredentials: true });
   return response.data;
 };
+
+export const getCurrentUser = async ()=> {
+  const response = await axiosInstance.get('/user/me', {
+    withCredentials: true,
+  });
+  return response.data;
+};

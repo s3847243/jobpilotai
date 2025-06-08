@@ -22,7 +22,7 @@ const initialState: FollowUpState = {
 const followUpSlice = createSlice({
   name: 'followUp',
   initialState,
-  reducers: {},
+  reducers: {      resetfollowUpState: () => initialState},
   extraReducers: (builder) => {
     builder
       // Fetch All
@@ -83,7 +83,10 @@ const followUpSlice = createSlice({
       .addCase(deleteFollowUpThunk.fulfilled, (state, action) => {
         state.followUps = state.followUps.filter((f) => f.id !== action.payload);
       });
+
+
   },
 });
+export const { resetfollowUpState } = followUpSlice.actions;
 
 export default followUpSlice.reducer;

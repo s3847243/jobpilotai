@@ -25,7 +25,7 @@ const initialState: CoverLetterState = {
 const coverLetterSlice = createSlice({
   name: 'coverLetters',
   initialState,
-  reducers: {},
+  reducers: {      resetcoverLetterState: () => initialState},
   extraReducers: (builder) => {
     builder
       // Fetch All
@@ -110,7 +110,9 @@ const coverLetterSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Failed to delete cover letter';
       });
+
+
   },
 });
-
+export const { resetcoverLetterState } = coverLetterSlice.actions;
 export default coverLetterSlice.reducer;

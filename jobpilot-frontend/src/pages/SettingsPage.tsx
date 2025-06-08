@@ -4,6 +4,14 @@ import { AppDispatch, RootState } from '../store'
 import { updateUserThunk, logoutUserThunk, deleteAccountThunk } from '../features/user/userThunk';
 import { Moon, Sun, LogOut, Trash2, MapPin, Palette, Shield, User ,Workflow} from 'lucide-react';
 import { toggleTheme } from '../features/theme/themeSlice';
+import { useNavigate } from 'react-router-dom';
+import { resetcoverLetterState } from '../features/coverletter/coverLetterSlice'; 
+import { resetfollowUpState } from '../features/followup/followUpSlice';
+import { resetJobState } from '../features/jobs/jobSlice';
+import { resetResumeState } from '../features/resume/resumeSlice';
+import { resetThemeState } from '../features/theme/themeSlice';
+import { resetUserState } from '../features/user/userSlice';
+import ConfirmModal from '../components/modal/ConfirmModal';
 const SettingsPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.users);
@@ -11,11 +19,14 @@ const SettingsPage = () => {
     const handleToggleTheme = () => {
     dispatch(toggleTheme());
     };
+      const navigate = useNavigate();
+
   const [name, setName] = useState(user.fullName || '');
   const [jobTitle, setJobTitle] = useState(user.jobTitle || '');
   const [location, setLocation] = useState(user.location||'');
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
+     const [showConfirm, setShowConfirm] = useState(false);
 
   const handleUpdateProfile = () => {
     setLoading(true);
@@ -29,16 +40,37 @@ const SettingsPage = () => {
   const handleLogout = () => {
     dispatch(logoutUserThunk())
       .unwrap()
-      .then(() => alert('Logged out!'));
+      .then(() => {
+        console.log('Logged out!');
+        dispatch(resetUserState());
+        dispatch(resetJobState());
+        dispatch(resetResumeState());
+        dispatch(resetcoverLetterState());
+        dispatch(resetfollowUpState());
+        dispatch(resetThemeState() );
+        navigate('/'); 
+      })
+      .catch((err) => {
+        console.error('Logout failed:', err);
+      });
   };
 
   const handleDeleteAccount = () => {
-    if (confirm('Are you sure you want to delete your account?')) {
+      
       dispatch(deleteAccountThunk())
         .unwrap()
-        .then(() => alert('Account deleted!'))
+        .then(() => {
+          console.log('Logged out!');
+          dispatch(resetUserState());
+          dispatch(resetJobState());
+          dispatch(resetResumeState());
+          dispatch(resetcoverLetterState());
+          dispatch(resetfollowUpState());
+          dispatch(resetThemeState() );
+          navigate('/'); 
+        })
         .catch((err) => alert('Delete failed: ' + err));
-    }
+    
   };
 
  return (
@@ -163,17 +195,31 @@ const SettingsPage = () => {
               </button>
               
               <button
-                onClick={handleDeleteAccount}
+                onClick={()=>{setShowConfirm(true)}}
                 className="w-full flex items-center space-x-3 p-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 group"
               >
                 <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
                 <span className="font-medium">Delete Account</span>
               </button>
+
             </div>
+            {/* Confirm Modal */}
+              
           </div>
         </div>
       </div>
+
     </div>
+    <ConfirmModal
+      isOpen={showConfirm}
+      title="Delete Account"
+      message="Are you sure you want to delete this account? This action cannot be undone."
+      onConfirm={handleDeleteAccount}
+      onCancel={() => setShowConfirm(false)}
+      loading={loading}
+      confirmText="Delete"
+      cancelText="Cancel"
+    />
   </div>
 );
 };

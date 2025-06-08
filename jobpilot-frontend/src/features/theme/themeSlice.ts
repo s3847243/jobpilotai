@@ -23,8 +23,11 @@ const themeSlice = createSlice({
       state.mode = action.payload;
       localStorage.setItem('theme', state.mode); // Persist on set
     },
+    
+    resetThemeState: () => initialState
+
   },
 });
 
-export const { toggleTheme, setTheme } = themeSlice.actions;
+export const { toggleTheme, setTheme,resetThemeState } = themeSlice.actions;
 export default themeSlice.reducer;

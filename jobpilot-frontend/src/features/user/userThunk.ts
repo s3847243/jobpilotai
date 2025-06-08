@@ -1,7 +1,7 @@
 // userThunk.ts
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {logout, login,updateUserProfile,deleteAccount } from '../../api/AuthApi';
+import {logout, login,updateUserProfile,deleteAccount, getCurrentUser } from '../../api/AuthApi';
 
 
 export const logoutUserThunk = createAsyncThunk('user/logout', async (_, { rejectWithValue }) => {
@@ -12,7 +12,18 @@ export const logoutUserThunk = createAsyncThunk('user/logout', async (_, { rejec
     return rejectWithValue(err.message);
   }
 });
-
+export const loadUserThunk = createAsyncThunk(
+  'user/loadUser',
+  async (_, thunkAPI) => {
+    try {
+      const user = await getCurrentUser();
+      console.log(user);
+      return user;
+    } catch (err) {
+      return thunkAPI.rejectWithValue('Not authenticated');
+    }
+  }
+);
 export const loginUserThunk = createAsyncThunk(
   'user/login',
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {

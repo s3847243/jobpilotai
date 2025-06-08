@@ -22,7 +22,8 @@ const initialState: ResumeState = {
 const resumesSlice = createSlice({
   name: 'resumes',
   initialState,
-  reducers: {},
+  reducers: {      resetResumeState: () => initialState,
+},
   extraReducers: (builder) => {
     builder
       .addCase(fetchResumesThunk.pending, (state) => {
@@ -82,7 +83,9 @@ const resumesSlice = createSlice({
       .addCase(deleteResumeByIdThunk.rejected, (state, action) => {
         state.error = action.payload as string;
       });
+
   },
 });
+export const { resetResumeState } = resumesSlice.actions;
 
 export default resumesSlice.reducer;

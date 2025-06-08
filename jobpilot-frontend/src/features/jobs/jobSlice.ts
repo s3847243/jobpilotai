@@ -16,7 +16,8 @@ const initialState: JobsState = {
 const jobsSlice = createSlice({
   name: 'jobs',
   initialState,
-  reducers: {},
+  reducers: {      resetJobState: () => initialState
+},
   extraReducers: (builder) => {
     builder
       // Fetch Jobs
@@ -91,7 +92,10 @@ const jobsSlice = createSlice({
       });
 
 
+
+
   },
 });
+export const { resetJobState } = jobsSlice.actions;
 
 export default jobsSlice.reducer;

@@ -12,14 +12,26 @@ import FollowUpAll from './components/followup/FollowUpAll'
 import ResumeDetails from './components/resume/ResumeDetails';
 import Register from './pages/Register'
 import SettingsPage from './pages/SettingsPage';
+import PrivateRoute from './routes/PrivateRoute';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { loadUserThunk } from './features/user/userThunk';
+import { AppDispatch } from './store';
 function App() {
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(loadUserThunk());
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-
+        <Route element={<PrivateRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/job-hub" />} />
           <Route path="job-hub" element={<JobApp />} />
@@ -31,14 +43,7 @@ function App() {
           <Route path="cover-letters" element={<CoverLetter />} />
           <Route path="resumes/:resumeId" element={<ResumeDetails />} /> 
           <Route path="settings" element={<SettingsPage />} />
-
-          {/* <Route path="resumes/raw/:resumeId" element={<ResumePage />} /> */}
-
-          {/* Jobs */}
-          {/* <Route path="job/:jobId/assign-resume" element={<AssignResumePage />} /> // Select existing resume */}
-
-          {/* Resumes */}
-          {/* <Route path="resumes/view/:resumeId" element={<ResumeOnlyPage />} /> // Standalone resume view */}
+        </Route>
         </Route>
 
 

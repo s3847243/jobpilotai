@@ -1,7 +1,7 @@
 // userSlice.ts
 
 import { createSlice } from '@reduxjs/toolkit';
-import { logoutUserThunk, loginUserThunk,updateUserThunk,deleteAccountThunk } from './userThunk';
+import { logoutUserThunk, loginUserThunk,updateUserThunk,deleteAccountThunk, loadUserThunk } from './userThunk';
 
 interface UserState {
   id: string | null;
@@ -10,6 +10,7 @@ interface UserState {
   jobTitle: string | null;
   location:string |null;
   loading: boolean;
+  isAuthenticated: boolean;
   error: string | null;
 }
 
@@ -20,15 +21,28 @@ const initialState: UserState = {
   jobTitle: null,
   location:null,
   loading: false,
+  isAuthenticated:false,
   error: null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {      resetUserState: () => initialState// ✅ reset action
+},
   extraReducers: (builder) => {
     builder
+      .addCase(loadUserThunk.fulfilled, (state, action) => {
+        state.id = action.payload.id;
+        state.fullName = action.payload.fullName;
+        state.email = action.payload.email;
+        state.jobTitle = action.payload.jobTitle;
+        state.location = action.payload.location;
+        state.isAuthenticated = true;
+      })
+      .addCase(loadUserThunk.rejected, (state) => {
+        state.isAuthenticated = false;
+      })
            // Login 
       .addCase(loginUserThunk.pending, (state) => {
         state.loading = true;
@@ -41,7 +55,7 @@ const userSlice = createSlice({
         state.email = action.payload.email;
         state.jobTitle = action.payload.jobTitle;
         state.location = action.payload.location;
-
+        state.isAuthenticated = true; 
         state.error = null;
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
@@ -100,7 +114,11 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
+
+
+
   },
 });
+export const { resetUserState } = userSlice.actions;
 
 export default userSlice.reducer;
