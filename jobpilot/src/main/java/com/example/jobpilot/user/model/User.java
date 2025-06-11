@@ -36,14 +36,9 @@ public class User {
     @Column(name = "user_id", updatable = false, nullable = false)
     @NonNull
     private UUID userId;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Job> jobs;
     @Column(unique = true, nullable = false)
     private String email;
-
     private String password; 
-
     private String fullName;
     private String jobTitle;
     private String location;

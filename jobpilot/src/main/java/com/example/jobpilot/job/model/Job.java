@@ -70,7 +70,6 @@ public class Job {
     @ElementCollection
     private List<String> missingSkills;
  
-    @JsonManagedReference 
     @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private CoverLetter coverLetter;
     

@@ -1,9 +1,9 @@
-package com.example.jobpilot.resume.mapper;
+package com.example.jobpilot.job.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.example.jobpilot.job.dto.JobSummaryDTO;
 import com.example.jobpilot.job.model.Job;
-import com.example.jobpilot.resume.dto.JobSummaryDTO;
 @Component
 public class JobSummaryMapper {
     public JobSummaryDTO toSummaryDTO(Job job) {

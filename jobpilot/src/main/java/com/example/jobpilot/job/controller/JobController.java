@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jobpilot.job.dto.JobDTO;
+import com.example.jobpilot.job.dto.JobSummaryDTO;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.service.JobService;
@@ -124,7 +125,18 @@ public class JobController {
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         jobService.deleteJobById(jobId, userPrincipal.getUser());
         return ResponseEntity.ok("Job deleted successfully.");
-    }   
+    } 
+    
+    @GetMapping(" ")
+    public ResponseEntity<List<JobSummaryDTO>> getJobsForResume(
+            @PathVariable UUID resumeId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<JobSummaryDTO> jobs = jobService.findJobsUsingResume(resumeId, userPrincipal.getUser());
+        return ResponseEntity.ok(jobs);
+    }
+
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeError(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

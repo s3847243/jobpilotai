@@ -24,9 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import com.example.jobpilot.TestSecurityConfig;
+import com.example.jobpilot.job.dto.JobSummaryDTO;
 import com.example.jobpilot.job.service.JobService;
 import com.example.jobpilot.resume.controller.ResumeController;
-import com.example.jobpilot.resume.dto.JobSummaryDTO;
 import com.example.jobpilot.resume.dto.ResumeDTO;
 import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.Role;
@@ -160,40 +160,6 @@ public class ResumeControllerTest {
             .andExpect(jsonPath("$.id").value(resumeId.toString()))
             .andExpect(jsonPath("$.filename").value("resume.pdf"));
     }
-    @Test
-    void getJobsForResume_shouldReturnListOfJobSummaries() throws Exception {
-        UUID resumeId = UUID.randomUUID();
-        User user = User.builder()
-                .userId(UUID.randomUUID())
-                .email("test@example.com")
-                .password("password")
-                .role(Role.USER)
-                .build();
 
-        setAuthenticatedUser(user); 
-        List<JobSummaryDTO> jobSummaries = List.of(
-            JobSummaryDTO.builder()
-                .id(UUID.randomUUID())
-                .title("Software Engineer")
-                .status("APPLIED")
-                .build(),
-            JobSummaryDTO.builder()
-                .id(UUID.randomUUID())
-                .title("Backend Developer")
-                .status("REJECTED")
-                .build()
-        );
-
-        Mockito.when(resumeService.getJobsForResume(eq(resumeId), eq(user)))
-            .thenReturn(jobSummaries);
-
-        mockMvc.perform(get("/api/resume/{resumeId}/jobs", resumeId))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].title").value("Software Engineer"))
-            .andExpect(jsonPath("$[0].status").value("APPLIED"))
-            .andExpect(jsonPath("$[1].title").value("Backend Developer"))
-            .andExpect(jsonPath("$[1].status").value("REJECTED"));
-    }
 
 }   

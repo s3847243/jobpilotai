@@ -37,6 +37,5 @@ public class Resume {
     @Column(columnDefinition = "TEXT")
     private String parsedSummary;
     private Instant uploadedAt;
-    @OneToMany(mappedBy = "resume")
-    private List<Job> jobs;
+
 }

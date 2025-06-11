@@ -12,7 +12,7 @@ export const getResumeById = async (resumeId: string): Promise<Resume> => {
 };
 
 export const getJobsByResumeId = async (resumeId: string): Promise<JobSummaryDTO[]> => {
-  const response = await axiosInstance.get(`/resume/${resumeId}/jobs`);
+  const response = await axiosInstance.get(`/job/jobs/${resumeId}`);
   return response.data;
 };
 

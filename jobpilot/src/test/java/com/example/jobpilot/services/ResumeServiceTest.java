@@ -27,11 +27,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jobpilot.ai.service.OpenAiService;
-import com.example.jobpilot.job.model.Job;
-import com.example.jobpilot.resume.dto.JobSummaryDTO;
+import com.example.jobpilot.job.mapper.JobSummaryMapper;
 import com.example.jobpilot.resume.dto.ParsedResumeDTO;
 import com.example.jobpilot.resume.dto.ResumeDTO;
-import com.example.jobpilot.resume.mapper.JobSummaryMapper;
 import com.example.jobpilot.resume.mapper.ResumeMapper;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.resume.repository.ResumeRepository;
@@ -243,68 +241,8 @@ class ResumeServiceTest {
         verify(resumeRepository).findById(resumeId);
         verifyNoInteractions(resumeMapper);
     }
-    @Test
-    void getJobsForResume_shouldReturnJobSummaryList_whenUserIsOwner() {
-        UUID resumeId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().userId(userId).build();
-
-        Resume resume = Resume.builder()
-                .id(resumeId)
-                .user(user)
-                .build();
-
-        Job job1 = Job.builder().id(UUID.randomUUID()).title("Dev").build();
-        Job job2 = Job.builder().id(UUID.randomUUID()).title("QA").build();
-        resume.setJobs(List.of(job1, job2));
-
-        JobSummaryDTO dto1 = JobSummaryDTO.builder().id(job1.getId()).title("Dev").build();
-        JobSummaryDTO dto2 = JobSummaryDTO.builder().id(job2.getId()).title("QA").build();
-
-        when(resumeRepository.findById(resumeId)).thenReturn(Optional.of(resume));
-        when(jobMapper.toSummaryDTO(job1)).thenReturn(dto1);
-        when(jobMapper.toSummaryDTO(job2)).thenReturn(dto2);
-
-        List<JobSummaryDTO> result = resumeService.getJobsForResume(resumeId, user);
-
-        assertEquals(2, result.size());
-        assertTrue(result.contains(dto1));
-        assertTrue(result.contains(dto2));
-
-        verify(resumeRepository).findById(resumeId);
-        verify(jobMapper).toSummaryDTO(job1);
-        verify(jobMapper).toSummaryDTO(job2);
-    }
-    @Test
-    void getJobsForResume_shouldThrowException_whenUserNotOwner() {
-        UUID resumeId = UUID.randomUUID();
-        User user = User.builder().userId(UUID.randomUUID()).build();
-        User otherUser = User.builder().userId(UUID.randomUUID()).build();
-
-        Resume resume = Resume.builder()
-                .id(resumeId)
-                .user(otherUser)
-                .build();
-
-        when(resumeRepository.findById(resumeId)).thenReturn(Optional.of(resume));
-
-        assertThrows(RuntimeException.class, () -> resumeService.getJobsForResume(resumeId, user));
-
-        verify(resumeRepository).findById(resumeId);
-        verifyNoInteractions(jobMapper);
-    }
-    @Test
-    void getJobsForResume_shouldThrowException_whenResumeNotFound() {
-        UUID resumeId = UUID.randomUUID();
-        User user = User.builder().userId(UUID.randomUUID()).build();
-
-        when(resumeRepository.findById(resumeId)).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> resumeService.getJobsForResume(resumeId, user));
-
-        verify(resumeRepository).findById(resumeId);
-        verifyNoInteractions(jobMapper);
-    }
+    
+   
 
 
 }

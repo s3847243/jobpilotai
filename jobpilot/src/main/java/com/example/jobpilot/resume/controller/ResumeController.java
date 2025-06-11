@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.jobpilot.resume.dto.JobSummaryDTO;
+
+import com.example.jobpilot.job.dto.JobSummaryDTO;
 import com.example.jobpilot.resume.dto.ResumeDTO;
 import com.example.jobpilot.resume.service.ResumeService;
 import com.example.jobpilot.user.model.UserPrincipal;
@@ -63,14 +64,14 @@ public class ResumeController {
         return ResponseEntity.ok(resume);
     }
 
-    @GetMapping("/{resumeId}/jobs")
-    public ResponseEntity<List<JobSummaryDTO>> getJobsForResume(
-            @PathVariable UUID resumeId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        List<JobSummaryDTO> jobs = resumeService.getJobsForResume(resumeId, userPrincipal.getUser());
-        return ResponseEntity.ok(jobs);
-    }
+    // @GetMapping("/{resumeId}/jobs")
+    // public ResponseEntity<List<JobSummaryDTO>> getJobsForResume(
+    //         @PathVariable UUID resumeId,
+    //         @AuthenticationPrincipal UserPrincipal userPrincipal
+    // ) {
+    //     List<JobSummaryDTO> jobs = resumeService.getJobsForResume(resumeId, userPrincipal.getUser());
+    //     return ResponseEntity.ok(jobs);
+    // }
 
 
 

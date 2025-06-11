@@ -1,4 +1,4 @@
-package com.example.jobpilot.resume.dto;
+package com.example.jobpilot.job.dto;
 
 import java.util.UUID;
 

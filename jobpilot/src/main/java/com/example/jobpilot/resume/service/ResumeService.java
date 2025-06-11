@@ -10,10 +10,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.jobpilot.ai.service.OpenAiService;
-import com.example.jobpilot.resume.dto.JobSummaryDTO;
 import com.example.jobpilot.resume.dto.ParsedResumeDTO;
 import com.example.jobpilot.resume.dto.ResumeDTO;
-import com.example.jobpilot.resume.mapper.JobSummaryMapper;
 import com.example.jobpilot.resume.mapper.ResumeMapper;
 import com.example.jobpilot.resume.model.Resume;
 import com.example.jobpilot.resume.repository.ResumeRepository;
@@ -29,7 +27,6 @@ public class ResumeService {
     private final S3Service s3Service;
     private final OpenAiService openAiService;
     private final ResumeMapper resumeMapper;
-    private final JobSummaryMapper jobMapper;
     public Resume internalUploadResume(MultipartFile file, User user) throws IOException {
         String s3Url = s3Service.uploadFile(file);
         String resumeText = extractTextFromPdf(file);
@@ -104,17 +101,17 @@ public class ResumeService {
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
         return resume;
     }
-    public List<JobSummaryDTO> getJobsForResume(UUID resumeId, User user) {
-        Resume resume = resumeRepository.findById(resumeId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+    // public List<JobSummaryDTO> getJobsForResume(UUID resumeId, User user) {
+    //     Resume resume = resumeRepository.findById(resumeId)
+    //             .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-        if (!resume.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized to access this resume's jobs");
-        }
+    //     if (!resume.getUser().getUserId().equals(user.getUserId())) {
+    //         throw new RuntimeException("Unauthorized to access this resume's jobs");
+    //     }
 
-        return resume.getJobs().stream()
-                .map(jobMapper::toSummaryDTO)
-                .toList();
-    }
+    //     return resume.getJobs().stream()
+    //             .map(jobMapper::toSummaryDTO)
+    //             .toList();
+    // }
 
 }

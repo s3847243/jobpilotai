@@ -17,7 +17,7 @@ import com.example.jobpilot.coverletter.model.CoverLetter;
 import com.example.jobpilot.coverletter.repository.CoverLetterRepository;
 import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.JobDetailsDTO;
-import com.example.jobpilot.job.dto.ManualJobRequest;
+import com.example.jobpilot.job.dto.JobSummaryDTO;
 import com.example.jobpilot.job.mapper.JobMapper;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.model.JobStatus;
@@ -219,6 +219,18 @@ public class JobService {
         }
 
         jobRepository.delete(job);
+    }
+    public List<JobSummaryDTO> findJobsUsingResume(UUID resumeId, User user) {
+        return jobRepository.findJobSummariesByResumeIdAndUser(resumeId, user).stream()
+            .map(view -> JobSummaryDTO.builder()
+                .id(view.getId())
+                .title(view.getTitle())
+                .company(view.getCompany())
+                .matchScore(view.getMatchScore())
+                .status(view.getStatus())
+                .url(view.getUrl())
+                .build()
+            ).toList();
     }
 
     
