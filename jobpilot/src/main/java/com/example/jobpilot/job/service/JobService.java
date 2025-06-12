@@ -18,6 +18,7 @@ import com.example.jobpilot.coverletter.repository.CoverLetterRepository;
 import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.JobDetailsDTO;
 import com.example.jobpilot.job.dto.JobSummaryDTO;
+import com.example.jobpilot.job.dto.MatchResult;
 import com.example.jobpilot.job.mapper.JobMapper;
 import com.example.jobpilot.job.model.Job;
 import com.example.jobpilot.job.model.JobStatus;
@@ -79,7 +80,6 @@ public class JobService {
         }
     }
 
-    // === Resume-Job Matching (basic skill overlap) ===
     public String openAiMatchSummary(Job job, Resume resume) {
         return openAiService.getMatchExplanation(
                 resume.getParsedSummary(),
@@ -109,13 +109,31 @@ public class JobService {
     
     public JobDTO  matchJobWithResume(Job job, Resume resume) {
         String feedback = openAiMatchSummary(job, resume);
-        Double score = extractScore(feedback);     
-        job.setMatchScore(score);
-        job.setMatchFeedback(feedback);
-        job.setMissingSkills(new ArrayList<>(extractMissingSkills(feedback)));
+        MatchResult parsedFeedback = parseMatchResult(feedback);
+        job.setMatchScore(parsedFeedback.getScore());
+        job.setMatchFeedback(parsedFeedback.getExplanation());
+        job.setMissingSkills(new ArrayList<>(parsedFeedback.getMissingSkills()));
 
         return jobMapper.toDTO(jobRepository.save(job));
     }
+    private MatchResult parseMatchResult(String feedback) {
+        Double score = extractScore(feedback);
+        String explanation = extractExplanation(feedback);
+        List<String> missingSkills = extractMissingSkills(feedback);
+
+        return MatchResult.builder()
+                .score(score)
+                .explanation(explanation)
+                .missingSkills(missingSkills)
+                .build();
+    }
+    private String extractExplanation(String feedback) {
+    Matcher matcher = Pattern.compile("(?i)explanation[:\\s]+(.*?)(?:missing skills:|$)", Pattern.DOTALL).matcher(feedback);
+    if (matcher.find()) {
+        return matcher.group(1).trim();
+    }
+    return null;
+}
     public Job getJobEntityById(UUID jobId, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));

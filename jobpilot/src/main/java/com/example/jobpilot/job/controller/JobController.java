@@ -127,7 +127,7 @@ public class JobController {
         return ResponseEntity.ok("Job deleted successfully.");
     } 
     
-    @GetMapping(" ")
+    @GetMapping("/jobs/{resumeId}")
     public ResponseEntity<List<JobSummaryDTO>> getJobsForResume(
             @PathVariable UUID resumeId,
             @AuthenticationPrincipal UserPrincipal userPrincipal

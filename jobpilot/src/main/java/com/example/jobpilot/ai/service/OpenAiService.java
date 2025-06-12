@@ -75,7 +75,7 @@ public class OpenAiService {
 
             TASK:
             1. Provide a match score (0–100).
-            2. Briefly explain how well the resume matches the job.
+            2. Provide a brief of how well the resume aligns with the job, mentioning key strengths or gaps.
             3. List any missing or weakly represented skills the candidate would need to be a better fit.
 
             Format your response like this:
