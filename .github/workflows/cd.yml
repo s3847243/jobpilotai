@@ -1,0 +1,52 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t jobpilot-app .
+
+      - name: Save Docker image as tar
+        run: docker save jobpilot-app -o jobpilot-app.tar
+
+      - name: Copy Docker image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "jobpilot-app.tar"
+          target: "~/jobpilot-app.tar"
+
+      - name: SSH into EC2 and run container
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker load -i jobpilot-app.tar
+            docker stop jobpilot || true && docker rm jobpilot || true
+            docker run -d --name jobpilot \
+            -e SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }} \
+            -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USER }} \
+            -e SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASS }} \
+            -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+            -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+            -e AWS_REGION=${{ secrets.AWS_REGION }} \
+            -e AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }} \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            -e OPENAI_MODEL=${{ secrets.OPENAI_MODEL }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -p 8080:8080 jobpilot-app

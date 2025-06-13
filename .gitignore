@@ -1,1 +1,9 @@
-jobpilot/src/main/resources/application.properties
+terraform.tfvars
+# Local state and backups
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# IDE settings
+.idea/
+.vscode/
