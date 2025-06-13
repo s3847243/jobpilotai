@@ -32,4 +32,5 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Build and run tests
+        working-directory: jobpilot
         run: mvn clean verify
