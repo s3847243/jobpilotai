@@ -19,7 +19,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Build Docker image
-        run: docker build -t jobpilot-app .
+        run: docker build -t jobpilot-app -f jobpilot/Dockerfile jobpilot/
 
       - name: Save Docker image as tar
         run: docker save jobpilot-app -o jobpilot-app.tar
