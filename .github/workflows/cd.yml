@@ -35,7 +35,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key_path: ./private_key
+          key: ${{ secrets.EC2_SSH_KEY }}
           source: "jobpilot-app.tar"
           target: "~/jobpilot-app.tar"
       
@@ -44,7 +44,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key_path: ./private_key
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker load -i jobpilot-app.tar
             docker stop jobpilot || true && docker rm jobpilot || true
