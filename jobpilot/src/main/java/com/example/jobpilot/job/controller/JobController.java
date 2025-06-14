@@ -3,10 +3,12 @@ package com.example.jobpilot.job.controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -141,6 +143,16 @@ public class JobController {
     public ResponseEntity<?> handleRuntimeError(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<?> handleNotFound(NoSuchElementException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
     }
 
 }

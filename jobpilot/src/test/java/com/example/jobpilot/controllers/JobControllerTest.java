@@ -4,8 +4,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,7 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.jobpilot.TestSecurityConfig;
-import com.example.jobpilot.coverletter.service.CoverLetterService;
 import com.example.jobpilot.job.controller.JobController;
 import com.example.jobpilot.job.dto.JobDTO;
 import com.example.jobpilot.job.dto.UpdateJobStatusRequest;
@@ -38,7 +35,6 @@ import com.example.jobpilot.user.model.User;
 import com.example.jobpilot.user.model.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(JobController.class)
@@ -262,8 +258,6 @@ public class JobControllerTest {
                 .password("password")
                 .role(Role.USER)
                 .build();
-                String url = "https://jobs.example.com/job456";
-
         setAuthenticatedUser(user); // 
         when(jobService.getJobById(jobId, user))
                 .thenThrow(new NoSuchElementException("Job not found"));

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.jobpilot.ai.service.OpenAiService;
@@ -84,7 +83,7 @@ class FollowUpEmailServiceTest {
         emailDTO.setBody(savedEmail.getBody());
 
         when(jobRepository.findById(job.getId())).thenReturn(Optional.of(job));
-        when(openAiService.getRawResponse(anyString())).thenReturn(generatedContent);
+        when(openAiService.generateFollowUpEmailPrompt(any(Job.class))).thenReturn(generatedContent);
         when(followUpEmailRepository.save(any(FollowUpEmail.class))).thenReturn(savedEmail);
         when(followUpEmailMapper.toDTO(any(FollowUpEmail.class))).thenReturn(emailDTO);
 
@@ -96,7 +95,7 @@ class FollowUpEmailServiceTest {
         assertEquals(generatedContent, result.getBody());
 
         verify(jobRepository).findById(job.getId());
-        verify(openAiService).getRawResponse(anyString());
+        verify(openAiService).generateFollowUpEmailPrompt(any(Job.class));
         verify(followUpEmailRepository).save(any(FollowUpEmail.class));
         verify(jobRepository).save(job); // optional if cascade is used
         verify(followUpEmailMapper).toDTO(any(FollowUpEmail.class));
@@ -227,7 +226,7 @@ class FollowUpEmailServiceTest {
         dto.setBody(improvedText);
 
         when(followUpEmailRepository.findByIdAndUserId(followUpId, userId)).thenReturn(Optional.of(existingEmail));
-        when(openAiService.getRawResponse(anyString())).thenReturn(improvedText);
+        when(openAiService.buildImprovementPrompt(any(FollowUpEmail.class), eq(instruction))).thenReturn(improvedText);
         when(followUpEmailRepository.save(existingEmail)).thenReturn(existingEmail);
         when(followUpEmailMapper.toDTO(existingEmail)).thenReturn(dto);
 
@@ -235,7 +234,7 @@ class FollowUpEmailServiceTest {
 
         assertEquals(improvedText, result.getBody());
         verify(followUpEmailRepository).findByIdAndUserId(followUpId, userId);
-        verify(openAiService).getRawResponse(contains("Please improve or modify"));
+        verify(openAiService).buildImprovementPrompt(existingEmail, instruction);
         verify(followUpEmailRepository).save(existingEmail);
         verify(followUpEmailMapper).toDTO(existingEmail);
     }

@@ -122,13 +122,12 @@ void addJobFromUrl_shouldThrowExceptionWhenOpenAiFails() throws Exception {
     try (MockedStatic<Jsoup> jsoupMock = mockStatic(Jsoup.class)) {
         Connection connection = mock(Connection.class);
         
-        // ✅ Mock the COMPLETE chain - this was missing!
         jsoupMock.when(() -> Jsoup.connect(url)).thenReturn(connection);
         when(connection.userAgent("Mozilla")).thenReturn(connection);
         when(connection.timeout(10_000)).thenReturn(connection);
         when(connection.get()).thenReturn(doc);
 
-        // ✅ Expect OpenAI to be called and throw
+        
         when(openAiService.extractJobInfoFromText(anyString()))
                 .thenThrow(new RuntimeException("OpenAI error"));
 
@@ -150,7 +149,6 @@ void addJobFromUrl_shouldThrowExceptionWhenResumeNotFound() throws Exception {
     try (MockedStatic<Jsoup> jsoupMock = mockStatic(Jsoup.class)) {
         Connection connection = mock(Connection.class);
         
-        // ✅ Mock the complete chain properly
         jsoupMock.when(() -> Jsoup.connect(url)).thenReturn(connection);
         when(connection.userAgent("Mozilla")).thenReturn(connection);
         when(connection.timeout(10_000)).thenReturn(connection);
@@ -177,7 +175,6 @@ void addJobFromUrl_shouldThrowExceptionWhenOpenAiReturnsInvalidJson() throws Exc
     try (MockedStatic<Jsoup> jsoupMock = mockStatic(Jsoup.class)) {
         Connection connection = mock(Connection.class);
         
-        // ✅ Mock the complete chain properly
         jsoupMock.when(() -> Jsoup.connect(url)).thenReturn(connection);
         when(connection.userAgent("Mozilla")).thenReturn(connection);
         when(connection.timeout(10_000)).thenReturn(connection);
@@ -239,11 +236,17 @@ void addJobFromUrl_shouldThrowExceptionWhenOpenAiReturnsInvalidJson() throws Exc
 
     @Test
     void matchJobWithResume_shouldUpdateJobWithScoreAndSkills() {
-        Job job = Job.builder().description("Job desc").build();
-        Resume resume = Resume.builder().parsedSummary("Resume summary").build();
+        Job job = Job.builder()
+                .description("Job description text")
+                .build();
+
+        Resume resume = Resume.builder()
+                .parsedSummary("Resume summary text")
+                .build();
 
         String aiFeedback = """
             Match Score: 85
+            Explanation: Strong match based on backend experience and relevant projects.
             Missing Skills: Java, Spring Boot
             """;
 
@@ -255,10 +258,12 @@ void addJobFromUrl_shouldThrowExceptionWhenOpenAiReturnsInvalidJson() throws Exc
 
         assertNotNull(result);
         assertEquals(85.0, job.getMatchScore());
+        assertEquals("Strong match based on backend experience and relevant projects.", job.getMatchFeedback());
         assertEquals(List.of("Java", "Spring Boot"), job.getMissingSkills());
-        assertEquals(aiFeedback, job.getMatchFeedback());
 
+        verify(openAiService).getMatchExplanation(resume.getParsedSummary(), job.getDescription());
         verify(jobRepository).save(job);
+        verify(jobMapper).toDTO(job);
     }
 
     @Test

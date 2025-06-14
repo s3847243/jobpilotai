@@ -4,12 +4,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.example.jobpilot.ai.service.OpenAiService;
@@ -133,7 +135,7 @@ public class JobService {
         return matcher.group(1).trim();
     }
     return null;
-}
+    }
     public Job getJobEntityById(UUID jobId, User user) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
@@ -151,10 +153,10 @@ public class JobService {
     }
     public JobDTO getJobById(UUID id, User user) {
         Job job = jobRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+            .orElseThrow(() -> new NoSuchElementException("Job not found")); 
 
         if (!job.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized"); 
         }
 
         return jobMapper.toDTO(job);
