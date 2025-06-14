@@ -27,7 +27,8 @@ jobs:
         run: chmod -R u+rwX .
       - name: Save Docker image as tar
         run: docker save jobpilot-app -o jobpilot-app.tar
-
+      - name: Fix tar file permissions
+        run: sudo chmod 644 jobpilot-app.tar
       - name: Copy Docker image to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
