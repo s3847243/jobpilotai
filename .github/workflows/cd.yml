@@ -60,4 +60,4 @@ jobs:
             -e OPENAI_MODEL=${{ secrets.OPENAI_MODEL }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -p 8080:8080 jobpilot-app
-            sudo rm jobpilot-app.tar
+            
