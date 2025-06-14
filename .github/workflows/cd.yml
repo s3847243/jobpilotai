@@ -28,16 +28,17 @@ jobs:
         run: docker save jobpilot-app -o jobpilot-app.tar
       - name: Fix tar file permissions
         run: sudo chmod 644 jobpilot-app.tar
+      - name: Fix key permissions
+        run: echo "${{ secrets.EC2_SSH_KEY }}" > private_key && chmod 600 private_key
       - name: Copy Docker image to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ec2-user
+          key_path: ./private_key
           source: "jobpilot-app.tar"
           target: "~/jobpilot-app.tar"
-      - name: Fix key permissions
-        run: echo "${{ secrets.EC2_SSH_KEY }}" > private_key && chmod 600 private_key
+      
       - name: SSH into EC2 and run container
         uses: appleboy/ssh-action@v1.0.0
         with:
