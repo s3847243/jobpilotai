@@ -46,9 +46,9 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker load -i jobpilot-app.tar
-            docker stop jobpilot || true && docker rm jobpilot || true
-            docker run -d --name jobpilot \
+            sudo docker load -i jobpilot-app.tar
+            sudo docker stop jobpilot || true && docker rm jobpilot || true
+            sudo docker run -d --name jobpilot \
             -e SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }} \
             -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USER }} \
             -e SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASS }} \
