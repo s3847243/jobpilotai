@@ -37,7 +37,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "jobpilot-app.tar"
-          target: "~/jobpilot-app.tar"
+          target: "~"
       
       - name: SSH into EC2 and run container
         uses: appleboy/ssh-action@v1.0.0
@@ -47,7 +47,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo docker load -i jobpilot-app.tar
-            sudo docker stop jobpilot || true && docker rm jobpilot || true
+            sudo docker stop jobpilot || true && sudo docker rm jobpilot || true
             sudo docker run -d --name jobpilot \
             -e SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }} \
             -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USER }} \
