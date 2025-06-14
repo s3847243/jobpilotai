@@ -38,6 +38,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "jobpilot-app.tar"
           target: "~"
+          strip_components: 0         
+          tar_tmp_path: ""           
+          rm: false                  
       
       - name: SSH into EC2 and run container
         uses: appleboy/ssh-action@v1.0.0
@@ -60,4 +63,6 @@ jobs:
             -e OPENAI_MODEL=${{ secrets.OPENAI_MODEL }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -p 8080:8080 jobpilot-app
+            sudo rm jobpilot-app.tar
+
             
