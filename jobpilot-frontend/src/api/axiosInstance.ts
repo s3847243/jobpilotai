@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api',
-  withCredentials: true, // this is required for sending cookies
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://13.210.143.209:8080/api',
+  withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
   } 
@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         // 🔁 Request to refresh the access token (refresh token is sent automatically via HttpOnly cookie)
-        await axios.post('http://localhost:8080/api/auth/refresh', {}, { withCredentials: true });
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh`, {}, { withCredentials: true });
         console.log("something happened")
         processQueue(null, true);
         return axiosInstance(originalRequest); // 🔁 Retry original
